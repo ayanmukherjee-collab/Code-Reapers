@@ -109,10 +109,10 @@
 
     <script>
         let visualizationData = null;
-        let backgroundImage = null;
-        let currentZoom = 1;
+        let scale = 1;
         let showNodes = true;
         let showLabels = true;
+        let backgroundImage = "sample_verify.png"; // Default to current test image for persistence
 
         // Load visualization data
         async function loadVisualizationData() {
@@ -121,13 +121,36 @@
 
             // Method 1: Try fetch (works with local server)
             try {
-                const response = await fetch('visualization-output.json');
+                const response = await fetch('visualization-output.json?t=' + new Date().getTime());
                 if (response.ok) {
                     visualizationData = await response.json();
                     loaded = true;
+
+                    // Attempt to load background image
+                    const img = new Image();
+                    img.onload = () => {
+                        backgroundImage = img.src;
+                        renderVisualization();
+                        updateInfo();
+                        document.getElementById('info').innerHTML =
+                            '<div style="color: green; padding: 10px; background: #e8f5e9; border-radius: 4px; margin-bottom: 10px;">' +
+                            '✅ Visualization data auto-loaded!</div>' +
+                            document.getElementById('info').innerHTML;
+                    };
+                    img.onerror = () => {
+                        console.warn("Background image not found, rendering without overlay.");
+                        backgroundImage = null;
+                        renderVisualization();
+                        updateInfo();
+                        document.getElementById('info').innerHTML =
+                            '<div style="color: green; padding: 10px; background: #e8f5e9; border-radius: 4px; margin-bottom: 10px;">' +
+                            '✅ Visualization data auto-loaded! (No background image found)</div>' +
+                            document.getElementById('info').innerHTML;
+                    }
+                    img.src = backgroundImage;
                 }
             } catch (error) {
-                // Fetch failed, try file input
+                console.log("Fetch failed, falling back to manual upload:", error);
             }
 
             // Method 2: File input (works with file:// protocol)
