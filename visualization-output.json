@@ -1,0 +1,657 @@
+{
+  "metadata": {
+    "source": "university-level1-floor-plan.svg",
+    "timestamp": "2025-12-14T07:17:48.686Z",
+    "version": "1.0.0"
+  },
+  "coordinateSpace": {
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 1000,
+      "height": 800
+    },
+    "units": "pixels"
+  },
+  "rooms": [
+    {
+      "id": "ROOM_MAIN_ENTRANCE",
+      "bounds": {
+        "x": 450,
+        "y": 750,
+        "width": 100,
+        "height": 50
+      },
+      "type": "exit",
+      "label": "Main Entrance",
+      "fillColor": "#FFFFE0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_TOILET_MEN",
+      "bounds": {
+        "x": 300,
+        "y": 700,
+        "width": 100,
+        "height": 50
+      },
+      "type": "facility",
+      "label": "Men's Restroom",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_TOILET_WOMEN",
+      "bounds": {
+        "x": 600,
+        "y": 700,
+        "width": 100,
+        "height": 50
+      },
+      "type": "facility",
+      "label": "Women's Restroom",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_FACULTY_LOUNGE",
+      "bounds": {
+        "x": 300,
+        "y": 600,
+        "width": 100,
+        "height": 100
+      },
+      "type": "facility",
+      "label": "Faculty Lounge",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_ADMINISTRATION",
+      "bounds": {
+        "x": 600,
+        "y": 600,
+        "width": 100,
+        "height": 100
+      },
+      "type": "office",
+      "label": "Administration Office",
+      "fillColor": "#E0FFE0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_1",
+      "bounds": {
+        "x": 50,
+        "y": 50,
+        "width": 150,
+        "height": 120
+      },
+      "type": "room",
+      "label": "Lecture Hall 1",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_3_TOP",
+      "bounds": {
+        "x": 250,
+        "y": 50,
+        "width": 150,
+        "height": 120
+      },
+      "type": "room",
+      "label": "Lecture Hall 3",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_4_TOP",
+      "bounds": {
+        "x": 450,
+        "y": 50,
+        "width": 150,
+        "height": 120
+      },
+      "type": "room",
+      "label": "Lecture Hall 4",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_COMPUTER_LAB_1",
+      "bounds": {
+        "x": 650,
+        "y": 50,
+        "width": 120,
+        "height": 120
+      },
+      "type": "facility",
+      "label": "Computer Lab",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_SCIENCE_LAB_BIOLOGY",
+      "bounds": {
+        "x": 800,
+        "y": 50,
+        "width": 100,
+        "height": 120
+      },
+      "type": "facility",
+      "label": "Science Lab (Biology)",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_SCIENCE_LAB_CHEMISTRY",
+      "bounds": {
+        "x": 900,
+        "y": 50,
+        "width": 100,
+        "height": 120
+      },
+      "type": "facility",
+      "label": "Science Lab (Chemistry)",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_COMPUTER_LAB_2",
+      "bounds": {
+        "x": 650,
+        "y": 200,
+        "width": 120,
+        "height": 120
+      },
+      "type": "facility",
+      "label": "Computer Lab",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_CAFETERIA",
+      "bounds": {
+        "x": 800,
+        "y": 200,
+        "width": 200,
+        "height": 120
+      },
+      "type": "facility",
+      "label": "Cafeteria",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_3_MID",
+      "bounds": {
+        "x": 50,
+        "y": 200,
+        "width": 150,
+        "height": 120
+      },
+      "type": "room",
+      "label": "Lecture Hall 3",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_3_BOTTOM",
+      "bounds": {
+        "x": 50,
+        "y": 350,
+        "width": 150,
+        "height": 120
+      },
+      "type": "room",
+      "label": "Lecture Hall 3",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_4_BOTTOM",
+      "bounds": {
+        "x": 50,
+        "y": 500,
+        "width": 150,
+        "height": 120
+      },
+      "type": "room",
+      "label": "Lecture Hall 4",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_LIBRARY",
+      "bounds": {
+        "x": 250,
+        "y": 350,
+        "width": 300,
+        "height": 300
+      },
+      "type": "facility",
+      "label": "Library",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_IT_SERVICES",
+      "bounds": {
+        "x": 600,
+        "y": 400,
+        "width": 100,
+        "height": 100
+      },
+      "type": "office",
+      "label": "IT Services",
+      "fillColor": "#E0FFE0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_STUDENT_CENTER",
+      "bounds": {
+        "x": 700,
+        "y": 400,
+        "width": 150,
+        "height": 150
+      },
+      "type": "facility",
+      "label": "Student Center",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    },
+    {
+      "id": "ROOM_AUDITORIUM",
+      "bounds": {
+        "x": 850,
+        "y": 400,
+        "width": 150,
+        "height": 200
+      },
+      "type": "room",
+      "label": "Auditorium",
+      "fillColor": "#E0E0E0",
+      "strokeColor": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    }
+  ],
+  "paths": [
+    {
+      "id": "PATH_MAIN_CORRIDOR",
+      "type": "corridor",
+      "segments": [
+        {
+          "start": {
+            "x": 50,
+            "y": 170
+          },
+          "end": {
+            "x": 1000,
+            "y": 170
+          }
+        }
+      ],
+      "color": "#FF0000",
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "PATH_ENTRANCE_TO_CENTER",
+      "type": "corridor",
+      "segments": [
+        {
+          "start": {
+            "x": 500,
+            "y": 750
+          },
+          "end": {
+            "x": 500,
+            "y": 650
+          }
+        }
+      ],
+      "color": "#FF0000",
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "PATH_LEFT_WING_VERTICAL",
+      "type": "corridor",
+      "segments": [
+        {
+          "start": {
+            "x": 125,
+            "y": 170
+          },
+          "end": {
+            "x": 125,
+            "y": 620
+          }
+        }
+      ],
+      "color": "#FF0000",
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "PATH_CENTER_HORIZONTAL",
+      "type": "corridor",
+      "segments": [
+        {
+          "start": {
+            "x": 400,
+            "y": 650
+          },
+          "end": {
+            "x": 600,
+            "y": 650
+          }
+        }
+      ],
+      "color": "#FF0000",
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "PATH_LIBRARY_ACCESS",
+      "type": "corridor",
+      "segments": [
+        {
+          "start": {
+            "x": 400,
+            "y": 650
+          },
+          "end": {
+            "x": 400,
+            "y": 350
+          }
+        }
+      ],
+      "color": "#FF0000",
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "PATH_RIGHT_WING",
+      "type": "corridor",
+      "segments": [
+        {
+          "start": {
+            "x": 600,
+            "y": 650
+          },
+          "end": {
+            "x": 775,
+            "y": 475
+          }
+        }
+      ],
+      "color": "#FF0000",
+      "strokeWidth": 2,
+      "opacity": 1
+    }
+  ],
+  "nodes": [],
+  "labels": [
+    {
+      "text": "Main Entrance",
+      "position": {
+        "x": 500,
+        "y": 775
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_MAIN_ENTRANCE",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Men's Restroom",
+      "position": {
+        "x": 350,
+        "y": 725
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_TOILET_MEN",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Women's Restroom",
+      "position": {
+        "x": 650,
+        "y": 725
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_TOILET_WOMEN",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Faculty Lounge",
+      "position": {
+        "x": 350,
+        "y": 650
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_FACULTY_LOUNGE",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Administration Office",
+      "position": {
+        "x": 650,
+        "y": 650
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_ADMINISTRATION",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Lecture Hall 1",
+      "position": {
+        "x": 125,
+        "y": 110
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_LECTURE_HALL_1",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Lecture Hall 3",
+      "position": {
+        "x": 325,
+        "y": 110
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_LECTURE_HALL_3_TOP",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Lecture Hall 4",
+      "position": {
+        "x": 525,
+        "y": 110
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_LECTURE_HALL_4_TOP",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Computer Lab",
+      "position": {
+        "x": 710,
+        "y": 110
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_COMPUTER_LAB_1",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Science Lab (Biology)",
+      "position": {
+        "x": 850,
+        "y": 110
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_SCIENCE_LAB_BIOLOGY",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Science Lab (Chemistry)",
+      "position": {
+        "x": 950,
+        "y": 110
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_SCIENCE_LAB_CHEMISTRY",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Computer Lab",
+      "position": {
+        "x": 710,
+        "y": 260
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_COMPUTER_LAB_2",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Cafeteria",
+      "position": {
+        "x": 900,
+        "y": 260
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_CAFETERIA",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Lecture Hall 3",
+      "position": {
+        "x": 125,
+        "y": 260
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_LECTURE_HALL_3_MID",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Lecture Hall 3",
+      "position": {
+        "x": 125,
+        "y": 410
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_LECTURE_HALL_3_BOTTOM",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Lecture Hall 4",
+      "position": {
+        "x": 125,
+        "y": 560
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_LECTURE_HALL_4_BOTTOM",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Library",
+      "position": {
+        "x": 400,
+        "y": 500
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_LIBRARY",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "IT Services",
+      "position": {
+        "x": 650,
+        "y": 450
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_IT_SERVICES",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Student Center",
+      "position": {
+        "x": 775,
+        "y": 475
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_STUDENT_CENTER",
+      "fontSize": 12,
+      "color": "#000000"
+    },
+    {
+      "text": "Auditorium",
+      "position": {
+        "x": 925,
+        "y": 500
+      },
+      "anchor": "room",
+      "anchorId": "ROOM_AUDITORIUM",
+      "fontSize": 12,
+      "color": "#000000"
+    }
+  ]
+}

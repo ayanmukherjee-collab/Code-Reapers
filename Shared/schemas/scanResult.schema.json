@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Floor Plan Scan Result",
+  "description": "Structured output from the floor plan scan phase",
+  "type": "object",
+  "required": ["metadata", "rooms", "paths"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["source", "timestamp", "version", "bounds"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Input file/format identifier"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of scan"
+        },
+        "version": {
+          "type": "string",
+          "description": "Scanner version (e.g., '1.0.0')"
+        },
+        "bounds": {
+          "type": "object",
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "width": { "type": "number", "minimum": 0 },
+            "height": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "rooms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/room"
+      }
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/path"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Non-fatal issues encountered during scanning"
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Fatal issues encountered during scanning"
+    }
+  },
+  "definitions": {
+    "room": {
+      "type": "object",
+      "required": ["id", "bounds", "confidence"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (deterministic)"
+        },
+        "bounds": {
+          "$ref": "#/definitions/boundingBox"
+        },
+        "label": {
+          "type": "string",
+          "description": "Room number/name (optional)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["room", "office", "stair", "elevator", "exit", "other"],
+          "description": "Type of space"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score (0-1)"
+        }
+      }
+    },
+    "path": {
+      "type": "object",
+      "required": ["id", "type", "segments", "confidence"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (deterministic)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["corridor", "hallway", "walkway", "connection"],
+          "description": "Type of walkable path"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lineSegment"
+          },
+          "minItems": 1
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Approximate width (if known)"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score (0-1)"
+        }
+      }
+    },
+    "boundingBox": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      }
+    },
+    "lineSegment": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": {
+          "$ref": "#/definitions/point"
+        },
+        "end": {
+          "$ref": "#/definitions/point"
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Navigation Points",
+  "description": "Start and end points for navigation (mapped to graph nodes)",
+  "type": "object",
+  "required": ["startPoints", "endPoints", "validation"],
+  "properties": {
+    "startPoints": {
+      "type": "object",
+      "required": ["entrances", "staircases", "lifts", "corridors", "all"],
+      "properties": {
+        "entrances": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/startPoint"
+          }
+        },
+        "staircases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/startPoint"
+          }
+        },
+        "lifts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/startPoint"
+          }
+        },
+        "corridors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/startPoint"
+          }
+        },
+        "all": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/startPoint"
+          }
+        }
+      }
+    },
+    "endPoints": {
+      "type": "object",
+      "required": ["rooms", "offices", "facilities", "all"],
+      "properties": {
+        "rooms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/endPoint"
+          }
+        },
+        "offices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/endPoint"
+          }
+        },
+        "facilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/endPoint"
+          }
+        },
+        "all": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/endPoint"
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["startPointsValid", "endPointsValid"],
+      "properties": {
+        "startPointsValid": {
+          "type": "boolean",
+          "description": "Whether all start points map to valid nodes"
+        },
+        "endPointsValid": {
+          "type": "boolean",
+          "description": "Whether all end points map to valid nodes"
+        },
+        "errors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Validation errors"
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Validation warnings"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "startPoint": {
+      "type": "object",
+      "required": ["nodeId", "type", "position"],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "description": "Graph node ID (must exist in graph)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["entrance", "staircase", "lift", "corridor"],
+          "description": "Start point type"
+        },
+        "position": {
+          "$ref": "#/definitions/point"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "roomId": {
+              "type": "string",
+              "description": "Associated room ID (if applicable)"
+            },
+            "floorLevel": {
+              "type": "number",
+              "description": "Floor level (for stairs/elevators)"
+            }
+          }
+        }
+      }
+    },
+    "endPoint": {
+      "type": "object",
+      "required": ["nodeId", "type", "position", "label", "metadata"],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "description": "Graph node ID (must exist in graph)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["room", "office", "facility"],
+          "description": "End point type"
+        },
+        "position": {
+          "$ref": "#/definitions/point"
+        },
+        "label": {
+          "type": "string",
+          "description": "Room number/name"
+        },
+        "metadata": {
+          "type": "object",
+          "required": ["roomId", "roomType"],
+          "properties": {
+            "roomId": {
+              "type": "string",
+              "description": "Room ID from scan"
+            },
+            "roomType": {
+              "type": "string",
+              "enum": ["room", "office", "facility"],
+              "description": "Room type"
+            },
+            "facilityType": {
+              "type": "string",
+              "enum": ["washroom", "lab", "cafe", "library", "gym", "facility"],
+              "description": "Specific facility type (if applicable)"
+            }
+          }
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    }
+  }
+}
+
