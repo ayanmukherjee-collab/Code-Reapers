@@ -1,0 +1,288 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Navigation Visualization Data",
+  "description": "Visualization-friendly output for rendering navigation data (rooms, paths, nodes)",
+  "type": "object",
+  "required": ["metadata", "coordinateSpace", "rooms", "paths", "nodes"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["source", "timestamp", "version"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Source identifier (scan result or graph)"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of data generation"
+        },
+        "version": {
+          "type": "string",
+          "description": "Visualization data format version"
+        }
+      }
+    },
+    "coordinateSpace": {
+      "type": "object",
+      "required": ["bounds", "units"],
+      "properties": {
+        "bounds": {
+          "$ref": "#/definitions/boundingBox",
+          "description": "Overall bounds of the coordinate space"
+        },
+        "units": {
+          "type": "string",
+          "enum": ["pixels", "meters", "feet"],
+          "description": "Coordinate units"
+        },
+        "scale": {
+          "type": "number",
+          "description": "Scale factor (e.g., 1 pixel = 0.1 meters)"
+        }
+      }
+    },
+    "rooms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/roomVisualization"
+      },
+      "description": "Rooms to render as rectangles"
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/pathVisualization"
+      },
+      "description": "Walkable paths to render as red lines"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/nodeVisualization"
+      },
+      "description": "Navigation nodes with positions"
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/labelVisualization"
+      },
+      "description": "Text labels for rooms/nodes"
+    }
+  },
+  "definitions": {
+    "roomVisualization": {
+      "type": "object",
+      "required": ["id", "bounds"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Room identifier"
+        },
+        "bounds": {
+          "$ref": "#/definitions/boundingBox",
+          "description": "Rectangle bounds (x, y, width, height)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["room", "office", "stair", "elevator", "exit", "other"],
+          "description": "Room type"
+        },
+        "label": {
+          "type": "string",
+          "description": "Room label/number (optional)"
+        },
+        "fillColor": {
+          "type": "string",
+          "description": "Fill color (hex, rgba, or named color)"
+        },
+        "strokeColor": {
+          "type": "string",
+          "description": "Stroke/border color"
+        },
+        "strokeWidth": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Border width"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity (0-1)"
+        }
+      }
+    },
+    "pathVisualization": {
+      "type": "object",
+      "required": ["id", "segments", "color"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Path identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["corridor", "hallway", "walkway", "connection"],
+          "description": "Path type"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lineSegment"
+          },
+          "minItems": 1,
+          "description": "Line segments (rendered as red lines)"
+        },
+        "color": {
+          "type": "string",
+          "default": "#FF0000",
+          "description": "Line color (default: red)"
+        },
+        "strokeWidth": {
+          "type": "number",
+          "minimum": 0,
+          "default": 2,
+          "description": "Line width"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1,
+          "description": "Line opacity"
+        }
+      }
+    },
+    "nodeVisualization": {
+      "type": "object",
+      "required": ["id", "position", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Node identifier"
+        },
+        "position": {
+          "$ref": "#/definitions/point",
+          "description": "Node position in shared coordinate space"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["room", "corridor", "intersection", "entrance", "stair", "elevator", "exit"],
+          "description": "Node type"
+        },
+        "radius": {
+          "type": "number",
+          "minimum": 0,
+          "default": 3,
+          "description": "Visual radius for rendering"
+        },
+        "color": {
+          "type": "string",
+          "description": "Node color (optional, defaults by type)"
+        },
+        "visible": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether node should be rendered"
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/connectionVisualization"
+          },
+          "description": "Visual connections to other nodes (optional)"
+        }
+      }
+    },
+    "connectionVisualization": {
+      "type": "object",
+      "required": ["toNodeId"],
+      "properties": {
+        "toNodeId": {
+          "type": "string",
+          "description": "Target node ID"
+        },
+        "color": {
+          "type": "string",
+          "description": "Connection line color"
+        },
+        "strokeWidth": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Connection line width"
+        },
+        "dashed": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether connection is dashed"
+        }
+      }
+    },
+    "labelVisualization": {
+      "type": "object",
+      "required": ["text", "position"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Label text"
+        },
+        "position": {
+          "$ref": "#/definitions/point",
+          "description": "Label position"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": ["room", "node"],
+          "description": "What the label is attached to"
+        },
+        "anchorId": {
+          "type": "string",
+          "description": "ID of room or node this label belongs to"
+        },
+        "fontSize": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Font size"
+        },
+        "color": {
+          "type": "string",
+          "description": "Text color"
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "lineSegment": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": {
+          "$ref": "#/definitions/point"
+        },
+        "end": {
+          "$ref": "#/definitions/point"
+        }
+      }
+    },
+    "boundingBox": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
+

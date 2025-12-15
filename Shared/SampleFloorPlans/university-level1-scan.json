@@ -1,0 +1,214 @@
+{
+  "metadata": {
+    "source": "university-level1-floor-plan.svg",
+    "timestamp": "2024-01-15T10:00:00Z",
+    "version": "1.0.0",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 1000,
+      "height": 800
+    }
+  },
+  "rooms": [
+    {
+      "id": "ROOM_MAIN_ENTRANCE",
+      "bounds": { "x": 450, "y": 750, "width": 100, "height": 50 },
+      "type": "exit",
+      "label": "Main Entrance",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_TOILET_MEN",
+      "bounds": { "x": 300, "y": 700, "width": 100, "height": 50 },
+      "type": "facility",
+      "label": "Men's Restroom",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_TOILET_WOMEN",
+      "bounds": { "x": 600, "y": 700, "width": 100, "height": 50 },
+      "type": "facility",
+      "label": "Women's Restroom",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_FACULTY_LOUNGE",
+      "bounds": { "x": 300, "y": 600, "width": 100, "height": 100 },
+      "type": "facility",
+      "label": "Faculty Lounge",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_ADMINISTRATION",
+      "bounds": { "x": 600, "y": 600, "width": 100, "height": 100 },
+      "type": "office",
+      "label": "Administration Office",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_1",
+      "bounds": { "x": 50, "y": 50, "width": 150, "height": 120 },
+      "type": "room",
+      "label": "Lecture Hall 1",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_3_TOP",
+      "bounds": { "x": 250, "y": 50, "width": 150, "height": 120 },
+      "type": "room",
+      "label": "Lecture Hall 3",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_4_TOP",
+      "bounds": { "x": 450, "y": 50, "width": 150, "height": 120 },
+      "type": "room",
+      "label": "Lecture Hall 4",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_COMPUTER_LAB_1",
+      "bounds": { "x": 650, "y": 50, "width": 120, "height": 120 },
+      "type": "facility",
+      "label": "Computer Lab",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_SCIENCE_LAB_BIOLOGY",
+      "bounds": { "x": 800, "y": 50, "width": 100, "height": 120 },
+      "type": "facility",
+      "label": "Science Lab (Biology)",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_SCIENCE_LAB_CHEMISTRY",
+      "bounds": { "x": 900, "y": 50, "width": 100, "height": 120 },
+      "type": "facility",
+      "label": "Science Lab (Chemistry)",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_COMPUTER_LAB_2",
+      "bounds": { "x": 650, "y": 200, "width": 120, "height": 120 },
+      "type": "facility",
+      "label": "Computer Lab",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_CAFETERIA",
+      "bounds": { "x": 800, "y": 200, "width": 200, "height": 120 },
+      "type": "facility",
+      "label": "Cafeteria",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_3_MID",
+      "bounds": { "x": 50, "y": 200, "width": 150, "height": 120 },
+      "type": "room",
+      "label": "Lecture Hall 3",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_3_BOTTOM",
+      "bounds": { "x": 50, "y": 350, "width": 150, "height": 120 },
+      "type": "room",
+      "label": "Lecture Hall 3",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_LECTURE_HALL_4_BOTTOM",
+      "bounds": { "x": 50, "y": 500, "width": 150, "height": 120 },
+      "type": "room",
+      "label": "Lecture Hall 4",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_LIBRARY",
+      "bounds": { "x": 250, "y": 350, "width": 300, "height": 300 },
+      "type": "facility",
+      "label": "Library",
+      "confidence": 0.95
+    },
+    {
+      "id": "ROOM_IT_SERVICES",
+      "bounds": { "x": 600, "y": 400, "width": 100, "height": 100 },
+      "type": "office",
+      "label": "IT Services",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_STUDENT_CENTER",
+      "bounds": { "x": 700, "y": 400, "width": 150, "height": 150 },
+      "type": "facility",
+      "label": "Student Center",
+      "confidence": 0.9
+    },
+    {
+      "id": "ROOM_AUDITORIUM",
+      "bounds": { "x": 850, "y": 400, "width": 150, "height": 200 },
+      "type": "room",
+      "label": "Auditorium",
+      "confidence": 0.95
+    }
+  ],
+  "paths": [
+    {
+      "id": "PATH_MAIN_CORRIDOR",
+      "type": "corridor",
+      "segments": [
+        { "start": { "x": 50, "y": 170 }, "end": { "x": 1000, "y": 170 } }
+      ],
+      "width": 10,
+      "confidence": 0.95
+    },
+    {
+      "id": "PATH_ENTRANCE_TO_CENTER",
+      "type": "corridor",
+      "segments": [
+        { "start": { "x": 500, "y": 750 }, "end": { "x": 500, "y": 650 } }
+      ],
+      "width": 8,
+      "confidence": 0.9
+    },
+    {
+      "id": "PATH_LEFT_WING_VERTICAL",
+      "type": "corridor",
+      "segments": [
+        { "start": { "x": 125, "y": 170 }, "end": { "x": 125, "y": 620 } }
+      ],
+      "width": 8,
+      "confidence": 0.9
+    },
+    {
+      "id": "PATH_CENTER_HORIZONTAL",
+      "type": "corridor",
+      "segments": [
+        { "start": { "x": 400, "y": 650 }, "end": { "x": 600, "y": 650 } }
+      ],
+      "width": 8,
+      "confidence": 0.9
+    },
+    {
+      "id": "PATH_LIBRARY_ACCESS",
+      "type": "corridor",
+      "segments": [
+        { "start": { "x": 400, "y": 650 }, "end": { "x": 400, "y": 350 } }
+      ],
+      "width": 8,
+      "confidence": 0.9
+    },
+    {
+      "id": "PATH_RIGHT_WING",
+      "type": "corridor",
+      "segments": [
+        { "start": { "x": 600, "y": 650 }, "end": { "x": 775, "y": 475 } }
+      ],
+      "width": 8,
+      "confidence": 0.9
+    }
+  ],
+  "warnings": [],
+  "errors": []
+}
+

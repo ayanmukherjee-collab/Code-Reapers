@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floor Plan Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .controls label {
+            margin-right: 15px;
+        }
+
+        .controls input[type="range"] {
+            width: 200px;
+        }
+
+        .controls span {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        #svgContainer {
+            border: 2px solid #ddd;
+            background: white;
+            overflow: auto;
+            max-width: 100%;
+        }
+
+        svg {
+            display: block;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .error {
+            color: red;
+            padding: 15px;
+            background: #ffe8e8;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        @keyframes drawPath {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏛️ Floor Plan Visualization</h1>
+
+        <div class="controls">
+            <label>
+                Zoom:
+                <input type="range" id="zoomSlider" min="0.1" max="2" step="0.1" value="1">
+                <span id="zoomValue">100%</span>
+            </label>
+            <label style="margin-left: 30px;">
+                Show Nodes:
+                <input type="checkbox" id="showNodes" checked>
+            </label>
+            <label style="margin-left: 30px;">
+                Show Labels:
+                <input type="checkbox" id="showLabels" checked>
+            </label>
+        </div>
+
+        <div id="svgContainer"></div>
+
+        <div class="info" id="info">
+            Loading visualization data...
+        </div>
+    </div>
+
+    <script>
+        let visualizationData = null;
+        let scale = 1;
+        let showNodes = true;
+        let showLabels = true;
+        let backgroundImage = "sample_verify.png"; // Default to current test image for persistence
+
+        // Load visualization data
+        async function loadVisualizationData() {
+            // Try multiple methods to load the data
+            let loaded = false;
+
+            // Method 1: Try fetch (works with local server)
+            try {
+                const response = await fetch('visualization-output.json?t=' + new Date().getTime());
+                if (response.ok) {
+                    visualizationData = await response.json();
+                    loaded = true;
+
+                    // Attempt to load background image
+                    const img = new Image();
+                    img.onload = () => {
+                        backgroundImage = img.src;
+                        renderVisualization();
+                        updateInfo();
+                        document.getElementById('info').innerHTML =
+                            '<div style="color: green; padding: 10px; background: #e8f5e9; border-radius: 4px; margin-bottom: 10px;">' +
+                            '✅ Visualization data auto-loaded!</div>' +
+                            document.getElementById('info').innerHTML;
+                    };
+                    img.onerror = () => {
+                        console.warn("Background image not found, rendering without overlay.");
+                        backgroundImage = null;
+                        renderVisualization();
+                        updateInfo();
+                        document.getElementById('info').innerHTML =
+                            '<div style="color: green; padding: 10px; background: #e8f5e9; border-radius: 4px; margin-bottom: 10px;">' +
+                            '✅ Visualization data auto-loaded! (No background image found)</div>' +
+                            document.getElementById('info').innerHTML;
+                    }
+                    img.src = backgroundImage;
+                }
+            } catch (error) {
+                console.log("Fetch failed, falling back to manual upload:", error);
+            }
+
+            // Method 2: File input (works with file:// protocol)
+            if (!loaded) {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = '.json';
+                fileInput.style.display = 'none';
+                fileInput.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            try {
+                                visualizationData = JSON.parse(event.target.result);
+                                renderVisualization();
+                                updateInfo();
+                                document.getElementById('info').innerHTML =
+                                    '<div style="color: green; padding: 10px; background: #e8f5e9; border-radius: 4px; margin-bottom: 10px;">' +
+                                    '✅ Visualization data loaded! Now select background image if needed.</div>' +
+                                    document.getElementById('info').innerHTML;
+                            } catch (error) {
+                                document.getElementById('info').innerHTML =
+                                    '<div class="error">❌ Error parsing JSON: ' + error.message + '</div>';
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                document.body.appendChild(fileInput);
+
+                // Image Input
+                const imageInput = document.createElement('input');
+                imageInput.type = 'file';
+                imageInput.accept = 'image/*';
+                imageInput.style.display = 'none';
+                imageInput.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            backgroundImage = event.target.result;
+                            renderVisualization();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                document.body.appendChild(imageInput);
+
+                // Show file picker buttons
+                const infoDiv = document.getElementById('info');
+                infoDiv.innerHTML =
+                    '<div class="error">' +
+                    '⚠️ Cannot load JSON directly (CORS restriction).<br><br>' +
+                    '<button onclick="document.querySelector(\'input[type=file][accept=\\\'.json\\\']\').click()" ' +
+                    'style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; margin-right: 10px;">' +
+                    '📁 1. Load data (.json)</button>' +
+                    '<button onclick="document.querySelector(\'input[type=file][accept=\\\'image/*\\\']\').click()" ' +
+                    'style="padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px;">' +
+                    '🖼️ 2. Load Floor Plan</button><br><br>' +
+                    '<small>Or start a local server: <code>python -m http.server 8000</code></small>' +
+                    '</div>';
+
+                // Auto-trigger file picker
+                setTimeout(() => {
+                    fileInput.click();
+                }, 100);
+            } else {
+                // Successfully loaded via fetch
+                renderVisualization();
+                updateInfo();
+            }
+        }
+
+        // Render the visualization
+        function renderVisualization() {
+            if (!visualizationData) return;
+
+            const container = document.getElementById('svgContainer');
+            const bounds = visualizationData.coordinateSpace.bounds;
+
+            // Calculate viewBox with padding
+            const padding = 50;
+            const viewBox = {
+                x: bounds.x - padding,
+                y: bounds.y - padding,
+                width: bounds.width + (padding * 2),
+                height: bounds.height + (padding * 2)
+            };
+
+            // Create SVG
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+            svg.setAttribute('width', '100%');
+            svg.style.height = 'auto';
+            svg.style.minHeight = '600px';
+
+            // 1. Render Background Image (if loaded)
+            if (backgroundImage) {
+                const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                image.setAttribute('href', backgroundImage);
+                image.setAttribute('x', bounds.x);
+                image.setAttribute('y', bounds.y);
+                image.setAttribute('width', bounds.width);
+                image.setAttribute('height', bounds.height);
+                // Lower opacity of image slightly to make paths pop, or keep full
+                image.setAttribute('opacity', '0.5');
+                svg.appendChild(image);
+            }
+
+            // 2. Render rooms (rectangles)
+            visualizationData.rooms.forEach(room => {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', room.bounds.x);
+                rect.setAttribute('y', room.bounds.y);
+                rect.setAttribute('width', room.bounds.width);
+                rect.setAttribute('height', room.bounds.height);
+                rect.setAttribute('fill', room.fillColor || '#E0E0E0');
+                rect.setAttribute('stroke', room.strokeColor || '#000000');
+                rect.setAttribute('stroke-width', room.strokeWidth || 1);
+                rect.setAttribute('opacity', room.opacity !== undefined ? room.opacity : 1);
+                rect.setAttribute('class', 'room');
+                rect.setAttribute('data-room-id', room.id);
+                if (room.label) {
+                    rect.setAttribute('data-label', room.label);
+                }
+                svg.appendChild(rect);
+            });
+
+            // 3. Render paths (red lines) with animation
+            visualizationData.paths.forEach((path, index) => {
+                path.segments.forEach(segment => {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', segment.start.x);
+                    line.setAttribute('y1', segment.start.y);
+                    line.setAttribute('x2', segment.end.x);
+                    line.setAttribute('y2', segment.end.y);
+                    line.setAttribute('stroke', path.color || '#FF0000');
+                    line.setAttribute('stroke-width', path.strokeWidth || 2);
+                    line.setAttribute('opacity', path.opacity !== undefined ? path.opacity : 1);
+                    line.setAttribute('class', 'path');
+
+                    // Animation: Staggered draw effect
+                    line.style.strokeDasharray = "1000";
+                    line.style.strokeDashoffset = "1000";
+                    // Randomize or stagger delays to look like "searching"
+                    const delay = index * 0.1;
+                    line.style.animation = `drawPath 1.5s ease-out forwards ${delay}s`;
+
+                    svg.appendChild(line);
+                });
+            });
+
+            // Render nodes (if enabled)
+            if (showNodes && visualizationData.nodes) {
+                visualizationData.nodes.forEach(node => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', node.position.x);
+                    circle.setAttribute('cy', node.position.y);
+                    circle.setAttribute('r', node.radius || 3);
+                    circle.setAttribute('fill', node.color || '#0066CC');
+                    circle.setAttribute('stroke', '#000000');
+                    circle.setAttribute('stroke-width', 1);
+                    circle.setAttribute('class', 'node');
+                    circle.setAttribute('data-node-id', node.id);
+                    svg.appendChild(circle);
+                });
+            }
+
+            // Render labels (if enabled)
+            if (showLabels && visualizationData.labels) {
+                visualizationData.labels.forEach(label => {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', label.position.x);
+                    text.setAttribute('y', label.position.y);
+                    text.setAttribute('fill', label.color || '#000000');
+                    text.setAttribute('font-size', label.fontSize || 12);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dominant-baseline', 'middle');
+                    text.setAttribute('class', 'label');
+                    text.textContent = label.text;
+                    svg.appendChild(text);
+                });
+            }
+
+            // Clear and add SVG
+            container.innerHTML = '';
+            container.appendChild(svg);
+        }
+
+        // Update info display
+        function updateInfo() {
+            if (!visualizationData) return;
+
+            const info = document.getElementById('info');
+            const rooms = visualizationData.rooms.length;
+            const paths = visualizationData.paths.length;
+            const nodes = visualizationData.nodes ? visualizationData.nodes.length : 0;
+            const labels = visualizationData.labels ? visualizationData.labels.length : 0;
+            const bounds = visualizationData.coordinateSpace.bounds;
+
+            info.innerHTML = `
+                <strong>Visualization Data:</strong><br>
+                📦 Rooms: ${rooms} | 🛤️ Paths: ${paths} | 📍 Nodes: ${nodes} | 🏷️ Labels: ${labels}<br>
+                📐 Bounds: ${bounds.width} x ${bounds.height} ${visualizationData.coordinateSpace.units || 'pixels'}<br>
+                <small>Hover over rooms to see labels</small>
+            `;
+        }
+
+        // Event listeners
+        document.getElementById('zoomSlider').addEventListener('input', (e) => {
+            currentZoom = parseFloat(e.target.value);
+            document.getElementById('zoomValue').textContent = Math.round(currentZoom * 100) + '%';
+            const svg = document.querySelector('#svgContainer svg');
+            if (svg) {
+                const bounds = visualizationData.coordinateSpace.bounds;
+                const padding = 50;
+                const viewBox = {
+                    x: (bounds.x - padding) / currentZoom,
+                    y: (bounds.y - padding) / currentZoom,
+                    width: (bounds.width + (padding * 2)) / currentZoom,
+                    height: (bounds.height + (padding * 2)) / currentZoom
+                };
+                svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+            }
+        });
+
+        document.getElementById('showNodes').addEventListener('change', (e) => {
+            showNodes = e.target.checked;
+            renderVisualization();
+        });
+
+        document.getElementById('showLabels').addEventListener('change', (e) => {
+            showLabels = e.target.checked;
+            renderVisualization();
+        });
+
+        // Add hover tooltips
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('room')) {
+                const label = e.target.getAttribute('data-label');
+                if (label) {
+                    e.target.setAttribute('title', label);
+                }
+            }
+        });
+
+        // Load on page load
+        loadVisualizationData();
+    </script>
+</body>
+
+</html>

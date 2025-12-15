@@ -1,0 +1,207 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Navigation Graph",
+  "description": "Navigation graph for pathfinding algorithms (A* ready)",
+  "type": "object",
+  "required": ["metadata", "nodes", "edges", "roomMappings"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["source", "timestamp", "version", "nodeCount", "edgeCount", "roomCount"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Source scan result identifier"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of graph creation"
+        },
+        "version": {
+          "type": "string",
+          "description": "Graph builder version"
+        },
+        "nodeCount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total number of nodes"
+        },
+        "edgeCount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total number of edges"
+        },
+        "roomCount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total number of rooms mapped"
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/edge"
+      }
+    },
+    "roomMappings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/roomMapping"
+      }
+    },
+    "bounds": {
+      "$ref": "#/definitions/boundingBox"
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Non-fatal issues"
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Fatal issues"
+    }
+  },
+  "definitions": {
+    "node": {
+      "type": "object",
+      "required": ["id", "type", "position", "connections"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique node ID (deterministic)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["room", "corridor", "intersection", "entrance", "stair", "elevator", "exit"],
+          "description": "Node type"
+        },
+        "position": {
+          "$ref": "#/definitions/point"
+        },
+        "connections": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of connected node IDs"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "roomId": {
+              "type": "string",
+              "description": "Room ID if node represents a room"
+            },
+            "pathId": {
+              "type": "string",
+              "description": "Path ID if node is on a path"
+            },
+            "pathIds": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Multiple path IDs (for intersections)"
+            },
+            "isIntersection": {
+              "type": "boolean",
+              "description": "Whether node is an intersection"
+            },
+            "label": {
+              "type": "string",
+              "description": "Room label (if applicable)"
+            }
+          }
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": ["id", "from", "to", "distance", "bidirectional"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique edge ID (deterministic)"
+        },
+        "from": {
+          "type": "string",
+          "description": "Source node ID"
+        },
+        "to": {
+          "type": "string",
+          "description": "Target node ID"
+        },
+        "distance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Euclidean distance between nodes"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["north", "south", "east", "west", "northeast", "northwest", "southeast", "southwest"],
+          "description": "Cardinal direction (for AR navigation)"
+        },
+        "bidirectional": {
+          "type": "boolean",
+          "description": "Whether edge can be traversed both ways"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "pathId": {
+              "type": "string",
+              "description": "Original path ID"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["corridor", "doorway", "intersection"],
+              "description": "Edge type"
+            }
+          }
+        }
+      }
+    },
+    "roomMapping": {
+      "type": "object",
+      "required": ["roomId", "nodeId", "position"],
+      "properties": {
+        "roomId": {
+          "type": "string",
+          "description": "Room ID from scan result"
+        },
+        "nodeId": {
+          "type": "string",
+          "description": "Corresponding node ID"
+        },
+        "position": {
+          "$ref": "#/definitions/point"
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "boundingBox": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
+

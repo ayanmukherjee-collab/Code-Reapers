@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Path Result",
+  "description": "Result of pathfinding computation",
+  "type": "object",
+  "required": ["success", "path"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether path was found"
+    },
+    "path": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered list of node IDs from start to end"
+    },
+    "length": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total path length (optional)"
+    },
+    "stepCount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Number of steps/nodes (optional)"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if path not found"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "startNode": {
+          "type": "string",
+          "description": "Start node ID"
+        },
+        "endNode": {
+          "type": "string",
+          "description": "End node ID"
+        },
+        "algorithm": {
+          "type": "string",
+          "description": "Algorithm used (e.g., 'A*')"
+        },
+        "computationTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Computation time in milliseconds"
+        }
+      }
+    }
+  }
+}
+
