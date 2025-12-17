@@ -1,0 +1,524 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2025-12-16T15:32:44.812Z",
+  "source": "floor plan 1.png",
+  "floor": 1,
+  "graph": {
+    "nodes": [
+      {
+        "id": "room_1",
+        "type": "room",
+        "x": 150,
+        "y": 125,
+        "floor": 1,
+        "metadata": {
+          "label": "Lecture Hall A",
+          "bbox": {
+            "x": 50,
+            "y": 50,
+            "width": 200,
+            "height": 150
+          },
+          "area": 30000
+        }
+      },
+      {
+        "id": "room_2",
+        "type": "room",
+        "x": 360,
+        "y": 100,
+        "floor": 1,
+        "metadata": {
+          "label": "Classroom 101",
+          "bbox": {
+            "x": 300,
+            "y": 50,
+            "width": 120,
+            "height": 100
+          },
+          "area": 12000
+        }
+      },
+      {
+        "id": "room_3",
+        "type": "room",
+        "x": 510,
+        "y": 100,
+        "floor": 1,
+        "metadata": {
+          "label": "Classroom 102",
+          "bbox": {
+            "x": 450,
+            "y": 50,
+            "width": 120,
+            "height": 100
+          },
+          "area": 12000
+        }
+      },
+      {
+        "id": "room_4",
+        "type": "room",
+        "x": 140,
+        "y": 310,
+        "floor": 1,
+        "metadata": {
+          "label": "Laboratory",
+          "bbox": {
+            "x": 50,
+            "y": 250,
+            "width": 180,
+            "height": 120
+          },
+          "area": 21600
+        }
+      },
+      {
+        "id": "room_5",
+        "type": "room",
+        "x": 350,
+        "y": 240,
+        "floor": 1,
+        "metadata": {
+          "label": "Office",
+          "bbox": {
+            "x": 300,
+            "y": 200,
+            "width": 100,
+            "height": 80
+          },
+          "area": 8000
+        }
+      },
+      {
+        "id": "room_6",
+        "type": "room",
+        "x": 490,
+        "y": 230,
+        "floor": 1,
+        "metadata": {
+          "label": "Restroom",
+          "bbox": {
+            "x": 450,
+            "y": 200,
+            "width": 80,
+            "height": 60
+          },
+          "area": 4800
+        }
+      },
+      {
+        "id": "hall_1",
+        "type": "hall",
+        "x": 275,
+        "y": 250,
+        "floor": 1,
+        "metadata": {
+          "label": "Main Corridor",
+          "bbox": {
+            "x": 260,
+            "y": 100,
+            "width": 30,
+            "height": 300
+          },
+          "area": 9000
+        }
+      },
+      {
+        "id": "hall_2",
+        "type": "hall",
+        "x": 175,
+        "y": 215,
+        "floor": 1,
+        "metadata": {
+          "label": "North Wing Hall",
+          "bbox": {
+            "x": 100,
+            "y": 200,
+            "width": 150,
+            "height": 30
+          },
+          "area": 4500
+        }
+      },
+      {
+        "id": "stairs_1",
+        "type": "stairs",
+        "x": 570,
+        "y": 370,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 550,
+            "y": 350,
+            "width": 40,
+            "height": 40
+          },
+          "area": 1600
+        }
+      },
+      {
+        "id": "stairs_2",
+        "type": "stairs",
+        "x": 70,
+        "y": 420,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 50,
+            "y": 400,
+            "width": 40,
+            "height": 40
+          },
+          "area": 1600
+        }
+      },
+      {
+        "id": "elevator_1",
+        "type": "elevator",
+        "x": 283,
+        "y": 393,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 270,
+            "y": 380,
+            "width": 25,
+            "height": 25
+          },
+          "area": 625
+        }
+      },
+      {
+        "id": "door_1",
+        "type": "door",
+        "x": 254,
+        "y": 103,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 248,
+            "y": 100,
+            "width": 12,
+            "height": 5
+          },
+          "area": 60
+        }
+      },
+      {
+        "id": "door_2",
+        "type": "door",
+        "x": 254,
+        "y": 153,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 248,
+            "y": 150,
+            "width": 12,
+            "height": 5
+          },
+          "area": 60
+        }
+      },
+      {
+        "id": "door_3",
+        "type": "door",
+        "x": 426,
+        "y": 103,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 420,
+            "y": 100,
+            "width": 12,
+            "height": 5
+          },
+          "area": 60
+        }
+      },
+      {
+        "id": "door_4",
+        "type": "door",
+        "x": 254,
+        "y": 253,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 248,
+            "y": 250,
+            "width": 12,
+            "height": 5
+          },
+          "area": 60
+        }
+      },
+      {
+        "id": "door_5",
+        "type": "door",
+        "x": 254,
+        "y": 323,
+        "floor": 1,
+        "metadata": {
+          "label": null,
+          "bbox": {
+            "x": 248,
+            "y": 320,
+            "width": 12,
+            "height": 5
+          },
+          "area": 60
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "door_1",
+        "to": "room_2",
+        "distance": 106
+      },
+      {
+        "from": "door_1",
+        "to": "hall_2",
+        "distance": 137
+      },
+      {
+        "from": "door_2",
+        "to": "room_1",
+        "distance": 108
+      },
+      {
+        "from": "door_2",
+        "to": "hall_1",
+        "distance": 99
+      },
+      {
+        "from": "door_3",
+        "to": "room_2",
+        "distance": 66
+      },
+      {
+        "from": "door_4",
+        "to": "room_5",
+        "distance": 97
+      },
+      {
+        "from": "door_4",
+        "to": "hall_1",
+        "distance": 21
+      },
+      {
+        "from": "door_5",
+        "to": "room_4",
+        "distance": 115
+      },
+      {
+        "from": "door_5",
+        "to": "hall_1",
+        "distance": 76
+      },
+      {
+        "from": "hall_1",
+        "to": "hall_2",
+        "distance": 106
+      },
+      {
+        "from": "stairs_1",
+        "to": "hall_1",
+        "distance": 318
+      },
+      {
+        "from": "stairs_2",
+        "to": "hall_2",
+        "distance": 230
+      },
+      {
+        "from": "elevator_1",
+        "to": "hall_1",
+        "distance": 143
+      }
+    ]
+  },
+  "statistics": {
+    "totalNodes": 16,
+    "totalEdges": 13,
+    "nodesByType": {
+      "room": 6,
+      "hall": 2,
+      "stairs": 2,
+      "elevator": 1,
+      "door": 5
+    }
+  },
+  "entities": {
+    "rooms": [
+      {
+        "id": "room_1",
+        "label": "Lecture Hall A",
+        "bbox": {
+          "x": 50,
+          "y": 50,
+          "width": 200,
+          "height": 150
+        }
+      },
+      {
+        "id": "room_2",
+        "label": "Classroom 101",
+        "bbox": {
+          "x": 300,
+          "y": 50,
+          "width": 120,
+          "height": 100
+        }
+      },
+      {
+        "id": "room_3",
+        "label": "Classroom 102",
+        "bbox": {
+          "x": 450,
+          "y": 50,
+          "width": 120,
+          "height": 100
+        }
+      },
+      {
+        "id": "room_4",
+        "label": "Laboratory",
+        "bbox": {
+          "x": 50,
+          "y": 250,
+          "width": 180,
+          "height": 120
+        }
+      },
+      {
+        "id": "room_5",
+        "label": "Office",
+        "bbox": {
+          "x": 300,
+          "y": 200,
+          "width": 100,
+          "height": 80
+        }
+      },
+      {
+        "id": "room_6",
+        "label": "Restroom",
+        "bbox": {
+          "x": 450,
+          "y": 200,
+          "width": 80,
+          "height": 60
+        }
+      }
+    ],
+    "halls": [
+      {
+        "id": "hall_1",
+        "label": "Main Corridor",
+        "bbox": {
+          "x": 260,
+          "y": 100,
+          "width": 30,
+          "height": 300
+        }
+      },
+      {
+        "id": "hall_2",
+        "label": "North Wing Hall",
+        "bbox": {
+          "x": 100,
+          "y": 200,
+          "width": 150,
+          "height": 30
+        }
+      }
+    ],
+    "stairs": [
+      {
+        "id": "stairs_1",
+        "bbox": {
+          "x": 550,
+          "y": 350,
+          "width": 40,
+          "height": 40
+        }
+      },
+      {
+        "id": "stairs_2",
+        "bbox": {
+          "x": 50,
+          "y": 400,
+          "width": 40,
+          "height": 40
+        }
+      }
+    ],
+    "elevators": [
+      {
+        "id": "elevator_1",
+        "bbox": {
+          "x": 270,
+          "y": 380,
+          "width": 25,
+          "height": 25
+        }
+      }
+    ],
+    "doors": [
+      {
+        "id": "door_1",
+        "bbox": {
+          "x": 248,
+          "y": 100,
+          "width": 12,
+          "height": 5
+        }
+      },
+      {
+        "id": "door_2",
+        "bbox": {
+          "x": 248,
+          "y": 150,
+          "width": 12,
+          "height": 5
+        }
+      },
+      {
+        "id": "door_3",
+        "bbox": {
+          "x": 420,
+          "y": 100,
+          "width": 12,
+          "height": 5
+        }
+      },
+      {
+        "id": "door_4",
+        "bbox": {
+          "x": 248,
+          "y": 250,
+          "width": 12,
+          "height": 5
+        }
+      },
+      {
+        "id": "door_5",
+        "bbox": {
+          "x": 248,
+          "y": 320,
+          "width": 12,
+          "height": 5
+        }
+      }
+    ]
+  }
+}
