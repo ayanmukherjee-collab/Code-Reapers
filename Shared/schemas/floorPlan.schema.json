@@ -1,0 +1,343 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "FloorPlanScanResult",
+    "description": "Schema for floor plan scan output with rooms, corridors, doors, stairs, elevators, and navigation graph",
+    "type": "object",
+    "required": [
+        "version",
+        "generatedAt",
+        "source",
+        "floorName",
+        "floorNumber",
+        "imageSize",
+        "rooms",
+        "corridors",
+        "doors",
+        "stairs",
+        "elevators",
+        "graph"
+    ],
+    "properties": {
+        "version": {
+            "type": "string",
+            "description": "Schema version"
+        },
+        "generatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO timestamp of when scan was generated"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source image filename"
+        },
+        "floorName": {
+            "type": "string",
+            "description": "Human-readable floor name"
+        },
+        "floorNumber": {
+            "type": "integer",
+            "description": "Floor number (1-indexed)"
+        },
+        "imageSize": {
+            "type": "object",
+            "required": [
+                "width",
+                "height"
+            ],
+            "properties": {
+                "width": {
+                    "type": "integer"
+                },
+                "height": {
+                    "type": "integer"
+                }
+            }
+        },
+        "rooms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "bbox",
+                    "center"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Room number/label"
+                    },
+                    "bbox": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 4,
+                        "maxItems": 4,
+                        "description": "[x, y, width, height]"
+                    },
+                    "center": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "description": "[cx, cy]"
+                    },
+                    "confidence": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "corridors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "polygon"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "polygon": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            },
+                            "minItems": 2,
+                            "maxItems": 2
+                        },
+                        "description": "Array of [x, y] points forming the corridor polygon"
+                    },
+                    "nodes": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            },
+                            "minItems": 2,
+                            "maxItems": 2
+                        },
+                        "description": "Navigation waypoints along corridor"
+                    }
+                }
+            }
+        },
+        "doors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "roomId",
+                    "connectsToCorridor",
+                    "position"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "roomId": {
+                        "type": "string",
+                        "description": "ID of connected room"
+                    },
+                    "connectsToCorridor": {
+                        "type": "boolean"
+                    },
+                    "corridorId": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "description": "[x, y] position of door"
+                    },
+                    "width": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "stairs": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "label",
+                    "bbox"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "bbox": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                    },
+                    "center": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                    }
+                }
+            }
+        },
+        "elevators": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "label",
+                    "bbox"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "bbox": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                    },
+                    "center": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                    }
+                }
+            }
+        },
+        "graph": {
+            "type": "object",
+            "required": [
+                "nodes",
+                "edges"
+            ],
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "type",
+                            "position",
+                            "entityId"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "room",
+                                    "corridor",
+                                    "stairs",
+                                    "elevator",
+                                    "door"
+                                ]
+                            },
+                            "position": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "label": {
+                                "type": "string"
+                            },
+                            "entityId": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "edges": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "from",
+                            "to",
+                            "distance",
+                            "type"
+                        ],
+                        "properties": {
+                            "from": {
+                                "type": "string"
+                            },
+                            "to": {
+                                "type": "string"
+                            },
+                            "distance": {
+                                "type": "number"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "door",
+                                    "corridor",
+                                    "vertical"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "processingTime": {
+                    "type": "number"
+                },
+                "detectionMethod": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "type": "number"
+                }
+            }
+        }
+    }
+}

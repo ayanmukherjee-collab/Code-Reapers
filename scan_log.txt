@@ -1,0 +1,39 @@
+🔑 Env API Key: Present
+🔑 Env API Key: Present
+═══════════════════════════════════════════════════════════
+  🏢 Floor Plan Scanner - Starting Pipeline
+═══════════════════════════════════════════════════════════
+
+🔍 Scanning floor plan: D:\My Websites\CodeReapers\Code-Reapers\Shared\SampleFloorPlans\dummy university\University Hall_0\University Hall_0-1_ocr_result.png
+⚠️  Preprocessing disabled, using original image
+DEBUG: Preprocessing done. Path: D:\My Websites\CodeReapers\Code-Reapers\Shared\SampleFloorPlans\dummy university\University Hall_0\University Hall_0-1_ocr_result.png
+DEBUG: Starting encoding...
+DEBUG: Encoding done. Length: 1251900
+DEBUG: Mime type: image/png
+DEBUG: Preparing to send to API...
+DEBUG: Sending fetch request to OpenRouter...
+DEBUG: Response received. Status: 429
+❌ OpenRouter Vision API failed: Error: OpenRouter API error: Provider returned error
+    at callOpenRouterVision (D:\My Websites\CodeReapers\Code-Reapers\AI\scanFloorPlan.js:218:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async detectStructures (D:\My Websites\CodeReapers\Code-Reapers\AI\scanFloorPlan.js:392:22)
+    at async runPipeline (D:\My Websites\CodeReapers\Code-Reapers\AI\scanFloorPlan.js:643:26)
+⚠️  Falling back to placeholder detection.
+✅ Detected 16 entities:
+   - Rooms: 6
+   - Halls: 2
+   - Stairs: 2
+   - Elevators: 1
+   - Doors: 5
+🔗 Building navigation graph...
+✅ Graph built with 16 nodes and 13 edges
+💾 Output saved to: D:\My Websites\CodeReapers\Code-Reapers\Shared\BuildingPacks\dummy_university\floor1-scan.json
+
+═══════════════════════════════════════════════════════════
+  ✅ Pipeline Complete!
+═══════════════════════════════════════════════════════════
+
+📊 Summary:
+   - Nodes: 16
+   - Edges: 13
+   - Output: D:\My Websites\CodeReapers\Code-Reapers\Shared\BuildingPacks\dummy_university\floor1-scan.json

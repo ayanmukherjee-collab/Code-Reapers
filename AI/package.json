@@ -1,15 +1,20 @@
 {
-  "name": "ai",
-  "version": "1.0.0",
-  "main": "scanFloorPlan.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "@google/generative-ai": "^0.24.1"
-  }
+    "name": "floorplan-detection-client",
+    "version": "2.0.0",
+    "description": "Floor Plan Detection API Client",
+    "main": "api_client.js",
+    "scripts": {
+        "detect": "node api_client.js",
+        "test": "echo \"No tests configured\""
+    },
+    "dependencies": {
+        "form-data": "^4.0.0"
+    },
+    "keywords": [
+        "floorplan",
+        "detection",
+        "api",
+        "client"
+    ],
+    "author": ""
 }
