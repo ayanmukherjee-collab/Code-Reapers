@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floor Plan Detection Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .controls button, .controls input {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .controls button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .controls input[type="file"] {
+            background: #2d2d44;
+            color: #ccc;
+        }
+        
+        .canvas-container {
+            position: relative;
+            background: #2d2d44;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        #canvas {
+            display: block;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d44, #1a1a2e);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #3d3d5c;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .wall-color { background: #ff6b6b; }
+        .room-color { background: rgba(102, 126, 234, 0.4); border: 2px solid #667eea; }
+        .door-color { background: #feca57; }
+        
+        .json-output {
+            background: #2d2d44;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 400px;
+            overflow: auto;
+        }
+        
+        .json-output pre {
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: #a0a0c0;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 30px 50px;
+            border-radius: 12px;
+            z-index: 1000;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #667eea;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toggle-btn {
+            padding: 8px 16px;
+            background: #2d2d44;
+            border: 2px solid #3d3d5c;
+            color: #888;
+        }
+        
+        .toggle-btn.active {
+            border-color: #667eea;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏗️ Floor Plan Detection Visualizer</h1>
+        
+        <div class="controls">
+            <input type="file" id="imageInput" accept="image/png,image/jpeg">
+            <button onclick="detectFloorPlan()">🔍 Run Detection</button>
+            <div class="toggle-group">
+                <button class="toggle-btn active" data-layer="walls" onclick="toggleLayer('walls')">Walls</button>
+                <button class="toggle-btn active" data-layer="rooms" onclick="toggleLayer('rooms')">Rooms</button>
+                <button class="toggle-btn active" data-layer="doors" onclick="toggleLayer('doors')">Doors</button>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color wall-color"></div>
+                <span>Walls</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color room-color"></div>
+                <span>Rooms</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color door-color"></div>
+                <span>Doors</span>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="wallCount">0</div>
+                <div class="stat-label">Walls Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="roomCount">0</div>
+                <div class="stat-label">Rooms Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="doorCount">0</div>
+                <div class="stat-label">Doors Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="confidence">0%</div>
+                <div class="stat-label">Confidence</div>
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <h3 style="margin-bottom: 15px;">Detection Results (JSON)</h3>
+        <div class="json-output">
+            <pre id="jsonOutput">Upload an image and click "Run Detection" to see results</pre>
+        </div>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>Detecting floor plan elements...</div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        
+        let currentImage = null;
+        let detectionResult = null;
+        let visibleLayers = { walls: true, rooms: true, doors: true };
+        
+        // Handle file selection
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        });
+        
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    currentImage = img;
+                    drawImage();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function drawImage() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (!currentImage) return;
+            
+            // Set canvas size
+            canvas.width = currentImage.width;
+            canvas.height = currentImage.height;
+            
+            // Draw image
+            ctx.drawImage(currentImage, 0, 0);
+            
+            // Draw detection overlays if available
+            if (detectionResult) {
+                drawDetections(ctx);
+            }
+        }
+        
+        function drawDetections(ctx) {
+            const results = detectionResult.detectionResults;
+            
+            // Draw rooms (first, so they're behind walls)
+            if (visibleLayers.rooms && results.rooms) {
+                ctx.fillStyle = 'rgba(102, 126, 234, 0.3)';
+                ctx.strokeStyle = '#667eea';
+                ctx.lineWidth = 2;
+                
+                results.rooms.forEach(room => {
+                    const x = room.position.start.x;
+                    const y = room.position.start.y;
+                    const w = room.position.end.x - x;
+                    const h = room.position.end.y - y;
+                    
+                    ctx.fillRect(x, y, w, h);
+                    ctx.strokeRect(x, y, w, h);
+                    
+                    // Draw room label
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '14px Arial';
+                    ctx.fillText(room.name || room.id, x + 5, y + 20);
+                    ctx.fillStyle = 'rgba(102, 126, 234, 0.3)';
+                });
+            }
+            
+            // Draw walls
+            if (visibleLayers.walls && results.walls) {
+                ctx.strokeStyle = '#ff6b6b';
+                ctx.lineWidth = 3;
+                
+                results.walls.forEach(wall => {
+                    ctx.beginPath();
+                    ctx.moveTo(wall.position.start.x, wall.position.start.y);
+                    ctx.lineTo(wall.position.end.x, wall.position.end.y);
+                    ctx.stroke();
+                });
+            }
+            
+            // Draw doors
+            if (visibleLayers.doors && results.doors) {
+                ctx.fillStyle = '#feca57';
+                ctx.strokeStyle = '#f39c12';
+                ctx.lineWidth = 2;
+                
+                results.doors.forEach(door => {
+                    const x = door.hinge.x;
+                    const y = door.hinge.y;
+                    const radius = door.radius || 30;
+                    
+                    // Draw hinge point
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw swing arc
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, (door.swing_angle || 90) * Math.PI / 180);
+                    ctx.stroke();
+                });
+            }
+        }
+        
+        function toggleLayer(layer) {
+            visibleLayers[layer] = !visibleLayers[layer];
+            
+            const btn = document.querySelector(`[data-layer="${layer}"]`);
+            btn.classList.toggle('active');
+            
+            drawImage();
+        }
+        
+        async function detectFloorPlan() {
+            const fileInput = document.getElementById('imageInput');
+            
+            if (!fileInput.files[0]) {
+                alert('Please select an image first');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            loading.classList.add('active');
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', fileInput.files[0]);
+                
+                const response = await fetch(`${API_URL}/run-inference`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Detection failed: ${response.status}`);
+                }
+                
+                detectionResult = await response.json();
+                
+                // Update stats
+                const results = detectionResult.detectionResults;
+                document.getElementById('wallCount').textContent = results.walls?.length || 0;
+                document.getElementById('roomCount').textContent = results.rooms?.length || 0;
+                document.getElementById('doorCount').textContent = results.doors?.length || 0;
+                document.getElementById('confidence').textContent = 
+                    Math.round((detectionResult.confidence || 0) * 100) + '%';
+                
+                // Update JSON output
+                document.getElementById('jsonOutput').textContent = 
+                    JSON.stringify(detectionResult, null, 2);
+                
+                // Redraw with detections
+                drawImage();
+                
+            } catch (error) {
+                alert(`Error: ${error.message}\n\nMake sure the API server is running at ${API_URL}`);
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
