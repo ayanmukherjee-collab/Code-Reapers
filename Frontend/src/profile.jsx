@@ -50,7 +50,7 @@ const Profile = () => {
             </div>
           </section>
 
-          {/* <section className="mb-6">
+          {/* <section className="mb-6"> 
             <div className="bg-white rounded-xl p-4 shadow-md flex items-center justify-between">
               <div>
                 <div className="font-bold">Airbnb your place</div>
