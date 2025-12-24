@@ -1,87 +1,79 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ThemeContext } from './themeContext.jsx';
+import Footer from './Footer.jsx';
 
-const Home = () => {
-  const handleClick = (label) => {
-    alert(`${label} clicked!`);
-  };
+const Homepage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const handleClick = (label) => alert(`${label} clicked!`);
+  const { theme } = useContext(ThemeContext);
 
   return (
-    // h-screen ensures the app takes the full height of the viewport
-    <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
-
-      {/* FIXED HEADER */}
-      <header className="flex items-center justify-between p-2 bg-white shadow-md shrink-0">
-        <h1 className="text-xl p-2 self-end font-bold">LocAlte</h1>
+    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 px-4 pt-6 pb-3 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} border-b border-gray-200`}>
+        <div className="max-w-xl mx-auto">
+          <div className="text-center font-bold text-xl">LocAlte</div>
+          <div className="mt-4 relative">
+            <span className="material-symbols-outlined text-gray-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+            <input
+              type="search"
+              placeholder="Search in shortcut..."
+              className="w-full bg-white rounded-full px-4 py-3 shadow-sm outline-none pl-12"
+            />
+          </div>
+        </div>
       </header>
 
-      {/* SCROLLABLE CONTAINER */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 px-4 pb-24 pt-28">
+        <div className="max-w-xl mx-auto space-y-3">
+          <div onClick={() => navigate('/chatbot')} className="bg-black text-white rounded-xl mt-7 p-5 flex items-center shadow-md cursor-pointer">
+            <div className="w-full bg-white rounded-2xl px-4 py-3 inline-flex items-center gap-3 shadow-sm">
+              <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                <img src="/assets/robothai.gif" alt="bot" className="w-full h-full object-cover" />
+              </div>
 
-        {/* FIXED TOP SECTION (Doesn't scroll internally, but moves with main content) */}
-        <section className="grid grid-cols-2 gap-2 p-6 justify-items-center">
-          <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer w-36 h-36" onClick={() => handleClick('Student Interest')}>
-            <img src="/assets/student-interest.png" alt="Student Interest" className="w-full h-24 object-cover" />
-            <p className="text-center p-1 text-sm font-medium">Student Interest</p>
-          </div>
-          <div className="bg-black rounded-lg shadow-md overflow-hidden cursor-pointer w-36 h-36 flex items-center justify-center" onClick={() => handleClick('Ask AI')}>
-            <img src="/assets/robothai.gif" alt="Ask AI" className="w-24 h-24 object-cover" />
-          </div>
-          <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer w-36 h-36" onClick={() => handleClick('Faculty & Staff')}>
-            <img src="/assets/prof.png" alt="Faculty & Staff" className="w-full h-24 object-cover" />
-            <p className="text-center p-1 text-sm font-medium">Faculty & Staff</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer w-36 h-36" onClick={() => handleClick('Buildings')}>
-            <img src="/assets/building.png" alt="Buildings" className="w-full h-24 object-cover" />
-            <p className="text-center p-1 text-sm font-medium">Buildings</p>
-          </div>
-        </section>
-
-        {/* Floor Plan Scanner Button */}
-        <section className="px-4 mb-4">
-          <button
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-3 rounded-md flex flex-col items-center hover:from-purple-700 hover:to-blue-700 transition-all"
-            onClick={() => window.navigateTo('scanner')}
-          >
-            <span className="text-xl text-white">🏗️ AI Floor Plan Scanner</span>
-            <span className="text-sm text-gray-200">Upload & detect rooms, walls, doors</span>
-          </button>
-        </section>
-
-        <section className="px-4 mb-4">
-          <button className="w-full bg-black py-3 rounded-md flex flex-col items-center" onClick={() => handleClick('Lost on campus? Start AR navigation now')}>
-            <span className="text-xl text-white">Lost on campus?</span>
-            <span className="text-sm text-gray-300">Start AR navigation now</span>
-          </button>
-        </section>
-
-        {/* ONLY THIS SECTION WILL SCROLL IF CONTENT EXCEEDS HEIGHT */}
-        <section className="p-4 pb-10">
-          <h2 className="text-lg font-bold mb-2">Recent Searches</h2>
-          {/* Repeat these items to test scrolling */}
-          {[1].map((item) => (
-            <div key={item} className="bg-white rounded-md shadow-md p-4 mb-3 cursor-pointer" onClick={() => handleClick('Library')}>
-              <p className="font-medium">Library {item}</p>
-              {/* <span className="text-gray-500 text-sm">Avdpne</span> */}
+              <div className="text-sm text-black font-medium">Hi! Ask me anything about campus.</div>
             </div>
-          ))}
-          <div className="bg-white rounded-md shadow-md p-4 cursor-pointer" onClick={() => handleClick('Washroom')}>
-            <p className="font-medium">Washroom</p>
-            {/* <span className="text-gray-500 text-sm">Student Center</span> */}
           </div>
-        </section>
+
+          <div className="grid grid-cols-2 gap-4">
+            <button onClick={() => navigate('/events')} className="bg-white rounded-xl shadow p-0 flex flex-col items-center w-36 overflow-hidden relative">
+              <img src="/assets/student-interest.png" alt="Student Interest" className="w-full h-36 object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-center py-2 text-sm font-medium">Student Interest</div>
+            </button>
+
+            <button onClick={() => navigate('/faculty')} className="bg-white rounded-xl shadow p-0 flex flex-col items-center w-36 overflow-hidden relative">
+              <img src="/assets/prof.png" alt="Faculty & Staff" className="w-full h-36 object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-center py-2 text-sm font-medium">Faculty & Staff</div>
+            </button>
+          </div>
+
+          <div>
+            <button className="w-full bg-black py-3 rounded-md flex flex-col items-center" onClick={() => handleClick('Lost on campus? Start AR navigation now')}>
+              <span className="text-xl text-white inline-flex items-center">
+                Lost on campus?
+                <span className="material-symbols-outlined  text-[28px]  ml-2 ">double_arrow</span>
+              </span>
+              <span className="text-sm text-gray-300">Start AR navigation now</span>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 shadow-md">
+            <h3 className="font-semibold mb-2">Recent Searches</h3>
+            <ul className="text-sm text-gray-600">
+              <li className="py-2 border-b last:border-b-0">Library</li>
+              <li className="py-2">Washroom</li>
+            </ul>
+          </div>
+        </div>
       </main>
 
-      {/* FIXED FOOTER */}
-      <footer className="flex justify-around items-center p-4 bg-white shadow-md shrink-0 border-t border-gray-200">
-        <div className="text-2xl cursor-pointer"><i className="fas fa-home"></i></div>
-
-        <div className="text-2xl cursor-pointer"><i className="fas fa-folder"></i></div>
-        <div className="text-2xl cursor-pointer"><i className="fas fa-bell"></i></div>
-        <div className="text-2xl cursor-pointer"><i className="fas fa-user"></i></div>
-      </footer>
-
+      {/* FIXED FOOTER WITH LABELS */}
+      <Footer />
     </div>
   );
 };
 
-export default Home;
+export default Homepage;
