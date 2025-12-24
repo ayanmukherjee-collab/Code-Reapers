@@ -1,13 +1,18 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ThemeContext } from './themeContext.jsx';
+import Footer from './Footer.jsx';
 
 const Homepage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
   const handleClick = (label) => alert(`${label} clicked!`);
+  const { theme } = useContext(ThemeContext);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="px-4 pt-8 pb-4">
+    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 px-4 pt-6 pb-3 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} border-b border-gray-200`}>
         <div className="max-w-xl mx-auto">
           <div className="text-center font-bold text-xl">LocAlte</div>
           <div className="mt-4 relative">
@@ -21,41 +26,38 @@ const Homepage = () => {
         </div>
       </header>
 
-      <main className="flex-1 px-4 pb-6">
-        <div className="max-w-xl mx-auto space-y-4">
-          <div className="bg-black text-white rounded-2xl p-4 flex items-center shadow-md">
-            <div className="w-15 h-15 bg-white/10 rounded-full flex items-center justify-center mr-4">
-              <img src="/assets/robothai.gif" alt="bot" className="w-15 h-15" />
-            </div>
-            <div className="flex-1">
-              <div className="font-semibold">Hi! Ask me anything about campus.</div>
+      <main className="flex-1 px-4 pb-24 pt-28">
+        <div className="max-w-xl mx-auto space-y-3">
+          <div onClick={() => navigate('/chatbot')} className="bg-black text-white rounded-xl mt-7 p-5 flex items-center shadow-md cursor-pointer">
+            <div className="w-full bg-white rounded-2xl px-4 py-3 inline-flex items-center gap-3 shadow-sm">
+              <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                <img src="/assets/robothai.gif" alt="bot" className="w-full h-full object-cover" />
+              </div>
+
+              <div className="text-sm text-black font-medium">Hi! Ask me anything about campus.</div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <button onClick={() => navigate('/events')} className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                <i className="fa-solid fa-star text-gray-700"></i>
-              </div>
-              <div className="text-sm font-medium">Student Interests</div>
+            <button onClick={() => navigate('/events')} className="bg-white rounded-xl shadow p-0 flex flex-col items-center w-36 overflow-hidden relative">
+              <img src="/assets/student-interest.png" alt="Student Interest" className="w-full h-36 object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-center py-2 text-sm font-medium">Student Interest</div>
             </button>
 
-            <button onClick={() => navigate('/faculty')} className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                <i className="fa-solid fa-users text-gray-700"></i>
-              </div>
-              <div className="text-sm font-medium">Faculty & Staff</div>
+            <button onClick={() => navigate('/faculty')} className="bg-white rounded-xl shadow p-0 flex flex-col items-center w-36 overflow-hidden relative">
+              <img src="/assets/prof.png" alt="Faculty & Staff" className="w-full h-36 object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-center py-2 text-sm font-medium">Faculty & Staff</div>
             </button>
           </div>
 
           <div>
-              <button className="w-full bg-black py-3 rounded-md flex flex-col items-center" onClick={() => handleClick('Lost on campus? Start AR navigation now')}>
-                <span className="text-xl text-white inline-flex items-center">
-                  Lost on campus?
-                  <span className="material-symbols-outlined  text-[28px]  ml-2 ">double_arrow</span>
-                </span>
-                <span className="text-sm text-gray-300">Start AR navigation now</span>
-              </button>
+            <button className="w-full bg-black py-3 rounded-md flex flex-col items-center" onClick={() => handleClick('Lost on campus? Start AR navigation now')}>
+              <span className="text-xl text-white inline-flex items-center">
+                Lost on campus?
+                <span className="material-symbols-outlined  text-[28px]  ml-2 ">double_arrow</span>
+              </span>
+              <span className="text-sm text-gray-300">Start AR navigation now</span>
+            </button>
           </div>
 
           <div className="bg-white rounded-xl p-4 shadow-md">
@@ -68,28 +70,8 @@ const Homepage = () => {
         </div>
       </main>
 
-           {/* FIXED FOOTER WITH LABELS */}
-      <footer className="flex justify-around items-center p-2 bg-white shadow-md shrink-0 border-t border-gray-200">
-        <div className="flex flex-col items-center cursor-pointer text-black" onClick={() => navigate('/')}>
-          <i className="fas fa-home text-xl"></i>
-          <span className="text-[10px] font-bold">Home</span>
-        </div>
-        
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => alert('Resources')}>
-          <i className="fa-regular fa-map"></i>
-          <span className="text-[10px] font-bold">Map</span>
-        </div>
-
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => alert('Alerts')}>
-          <i className="fas fa-bell text-xl"></i>
-          <span className="text-[10px] font-bold">Alerts</span>
-        </div>
-
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => navigate('/profile')}>
-          <i className="fas fa-user text-xl"></i>
-          <span className="text-[10px] font-bold">Profile</span>
-        </div>
-      </footer>
+      {/* FIXED FOOTER WITH LABELS */}
+      <Footer />
     </div>
   );
 };

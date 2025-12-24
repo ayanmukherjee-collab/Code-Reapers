@@ -1,4 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ThemeContext } from './themeContext.jsx';
+import Footer from './Footer.jsx';
 
 const FacultyPage = () => {
   const [activeTab, setActiveTab] = useState('Teachers');
@@ -88,15 +91,20 @@ const FacultyPage = () => {
     person.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const { theme } = useContext(ThemeContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   return (
-    <div className="h-screen flex flex-col bg-gray-50 font-sans text-gray-800 overflow-hidden relative">
+    <div className={`h-screen flex flex-col ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-gray-800'} font-sans overflow-hidden relative`}>
       
       {showDropdown && (
         <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowDropdown(false)} />
       )}
 
       {selectedPerson && (
-        <div className="absolute inset-0 z-60 bg-white flex flex-col">
+        <div className="absolute top-0 left-0 right-0 bottom-16 z-60 bg-white flex flex-col">
           <div className="p-4 flex items-center border-b border-gray-100">
             <button onClick={() => setSelectedPerson(null)} className="mr-4 text-xl active:opacity-50">
               <i className="fa-solid fa-arrow-left"></i>
@@ -140,8 +148,8 @@ const FacultyPage = () => {
         </div>
       )}
 
-      <div className="shrink-0 bg-white shadow-md z-50">
-        <header className="flex items-center justify-between p-4 border-b border-gray-100">
+      <div className={`${theme === 'dark' ? 'bg-black' : 'bg-white'} shrink-0 shadow-md z-50 fixed top-0 left-0 right-0 border-b border-gray-100`}>
+        <header className="flex items-center justify-between p-4">
           <h1 className="text-xl font-bold">LocAlte <span className="text-xs font-normal text-gray-400 ml-1">{selectedSem}</span></h1>
         </header>
 
@@ -187,16 +195,16 @@ const FacultyPage = () => {
             </div>
           </div>
 
-          <div className="flex gap-4 p-1 bg-gray-100 rounded-2xl">
+          <div className={`flex gap-4 p-1 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} rounded-2xl`}>
             <button onClick={() => setActiveTab('Teachers')} className={`flex-1 py-2 rounded-xl font-bold transition-all ${activeTab === 'Teachers' ? 'bg-white shadow-sm text-black' : 'text-gray-400'}`}>Teachers</button>
             <button onClick={() => setActiveTab('Staffs')} className={`flex-1 py-2 rounded-xl font-bold transition-all ${activeTab === 'Staffs' ? 'bg-white shadow-sm text-black' : 'text-gray-400'}`}>Staffs</button>
           </div>
         </div>
       </div>
 
-      <main className="flex-1 overflow-y-auto p-4 space-y-4">
+      <main className="flex-1 overflow-y-auto p-4 space-y-4 pt-28 pb-24">
         {filteredData.map((person) => (
-          <div key={person.id} onClick={() => setSelectedPerson(person)} className="bg-white p-4 rounded-3xl shadow-sm border border-gray-50 flex items-center space-x-4 cursor-pointer active:scale-95 transition-transform">
+          <div key={person.id} onClick={() => setSelectedPerson(person)} className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-50 text-gray-800'} p-4 rounded-3xl shadow-sm border flex items-center space-x-4 cursor-pointer active:scale-95 transition-transform`}>
             <div className="w-14 h-14 bg-gray-200 rounded-full shrink-0 overflow-hidden shadow-inner">
               <img src={person.image} alt="" className="w-full h-full object-cover" />
             </div>
@@ -208,18 +216,13 @@ const FacultyPage = () => {
         ))}
         {filteredData.length === 0 && (
           <div className="text-center py-20">
-             <p className="text-gray-400 mb-1 italic text-sm">No {activeTab} found for</p>
-             <p className="text-gray-600 font-bold text-lg">{selectedSem}</p>
+             <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} mb-1 italic text-sm`}>No {activeTab} found for</p>
+             <p className={`${theme === 'dark' ? 'text-gray-200' : 'text-gray-600'} font-bold text-lg`}>{selectedSem}</p>
           </div>
         )}
       </main>
-
-      <footer className="flex justify-around items-center p-4 bg-white border-t border-gray-200 shrink-0">
-        <div className="text-2xl text-gray-400"><i className="fas fa-home"></i></div>
-        <div className="text-2xl text-gray-400"><i className="fas fa-folder"></i></div>
-        <div className="text-2xl text-gray-400"><i className="fas fa-bell"></i></div>
-        <div className="text-2xl text-black"><i className="fas fa-user"></i></div>
-      </footer>
+        {/* FIXED FOOTER WITH LABELS */}
+        <Footer />
     </div>
   );
 };

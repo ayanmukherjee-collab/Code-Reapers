@@ -5,10 +5,10 @@ import Faculty from './faculty.jsx';
 import Buildings from './buildings.jsx';
 import Events from './event.jsx';
 import Profile from './profile.jsx';
+import Chatbot from './chatbot.jsx';
 
 function App() {
   return (
-    <Router>
       <Routes>
         {/* This tells the app: if the URL  is "/", show Home */}
         <Route path="/" element={<Home />} />
@@ -18,8 +18,8 @@ function App() {
         <Route path="/buildings" element={<Buildings />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
-    </Router>
   );
 }
 

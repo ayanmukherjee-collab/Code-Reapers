@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ThemeContext } from './themeContext.jsx';
+import Footer from './Footer.jsx';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
   const [helpOpen, setHelpOpen] = useState(false);
+  const { theme, setLight, setDark } = useContext(ThemeContext);
+  const handleClick = (label) => alert(label);
 
-//   const handleItem = (label) => {
-//     if (label === 'Edit Profile') navigate('/faculty');
-//     else if (label === 'Offline Maps') alert('Offline Maps');
-//     else if (label === 'My Clubs') alert('My Clubs');
-//     else if (label === 'Semester') alert('Semester');
-//     else if (label === 'Notifications') alert('Notifications');
-//     else if (label === 'App Language') alert('App Language');
-//     else if (label === 'Theme') alert('Theme');
-//   };
+  //   const handleItem = (label) => {
+  //     if (label === 'Edit Profile') navigate('/faculty');
+  //     else if (label === 'Offline Maps') alert('Offline Maps');
+  //     else if (label === 'My Clubs') alert('My Clubs');
+  //     else if (label === 'Semester') alert('Semester');
+  //     else if (label === 'Notifications') alert('Notifications');
+  //     else if (label === 'App Language') alert('App Language');
+  //     else if (label === 'Theme') alert('Theme');
+  //   };
 
   const handleHelpAction = (action) => {
     if (action === 'Delete account') {
@@ -30,14 +36,27 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50 flex flex-col">
+    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
       <div className="max-w-xl w-full mx-auto flex-1">
-        <header className="px-6 pt-10 pb-4">
-          <h1 className="text-3xl font-extrabold">Profile</h1>
+        <header className={`fixed top-0 left-0 right-0 z-50 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} border-b border-gray-200`}>
+          <div className="px-6 pt-6 pb-3 flex items-center">
+            <div className="mr-4">
+              {theme === 'light' ? (
+                <button aria-label="Switch to dark" onClick={setDark} className="p-2 rounded-full">
+                  <span className="material-symbols-outlined">dark_mode</span>
+                </button>
+              ) : (
+                <button aria-label="Switch to light" onClick={setLight} className="p-2 rounded-full">
+                  <span className="material-symbols-outlined">light_mode</span>
+                </button>
+              )}
+            </div>
+            <h1 className="text-3xl font-extrabold">Profile</h1>
+          </div>
         </header>
 
-        <main className="px-4 pb-6">
-          <section className="bg-white rounded-xl p-4 shadow-sm mb-6">
+        <main className="px-4 pb-24 pt-28">
+          <section className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl p-4 shadow-sm mb-6`}>
             <div className="flex items-center">
               <div className="w-12 h-12 rounded-full bg-gray-200 mr-4" />
               <div className="flex-1">
@@ -63,7 +82,7 @@ const Profile = () => {
           <section>
             <h2 className="text-lg font-semibold mb-3">Account settings</h2>
 
-            <ul className="bg-white rounded-xl divide-y divide-gray-100 shadow-sm overflow-hidden">
+            <ul className={`${theme === 'dark' ? 'bg-gray-900 divide-gray-700' : 'bg-white divide-gray-100'} rounded-xl divide-y shadow-sm overflow-hidden`}>
               {[
                 'Edit Profile',
                 'Offline Maps',
@@ -73,7 +92,7 @@ const Profile = () => {
                 'App Language',
                 'Theme',
               ].map((item) => (
-                <li key={item} className="p-4 flex items-center justify-between cursor-pointer" onClick={() => handleItem(item)}>
+                <li key={item} className="p-4 flex items-center justify-between cursor-pointer" onClick={() => handleClick(item)}>
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
                       <i className="fa-solid fa-circle"></i>
@@ -98,7 +117,7 @@ const Profile = () => {
                 {helpOpen && (
                   <div className="mt-3 space-y-2 pl-11">
                     {['FAQs', 'Report an issue', 'Contact admin', 'Delete account'].map((h) => (
-                      <button key={h} onClick={() => handleHelpAction(h)} className="w-full text-left text-sm text-gray-700 py-2">
+                      <button key={h} onClick={() => handleHelpAction(h)} className={`${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} w-full text-left text-sm py-2`}>
                         {h}
                       </button>
                     ))}
@@ -116,28 +135,8 @@ const Profile = () => {
         </main>
       </div>
 
-       {/* FIXED FOOTER WITH LABELS */}
-      <footer className="flex justify-around items-center p-2 bg-white shadow-md shrink-0 border-t border-gray-200">
-        <div className="flex flex-col items-center cursor-pointer text-black" onClick={() => navigate('/')}>
-          <i className="fas fa-home text-xl"></i>
-          <span className="text-[10px] font-bold">Home</span>
-        </div>
-        
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => handleClick('Resources')}>
-          <i className="fa-regular fa-map"></i>
-          <span className="text-[10px] font-bold">Map</span>
-        </div>
-
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => handleClick('Alerts')}>
-          <i className="fas fa-bell text-xl"></i>
-          <span className="text-[10px] font-bold">Alerts</span>
-        </div>
-
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => navigate('/profile')}>
-          <i className="fas fa-user text-xl"></i>
-          <span className="text-[10px] font-bold">Profile</span>
-        </div>
-      </footer>
+      {/* FIXED FOOTER WITH LABELS */}
+      <Footer />
     </div>
   );
 };

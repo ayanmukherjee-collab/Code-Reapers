@@ -1,8 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ThemeContext } from './themeContext.jsx';
+import Footer from './Footer.jsx';
 
 const Events = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const { theme } = useContext(ThemeContext);
 
   const handleCardClick = (label) => {
     // Placeholder: you can route to detailed pages later
@@ -10,12 +15,12 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="px-6 pt-10 pb-6">
+    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 px-6 pt-6 pb-3 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} border-b border-gray-200`}>
         <h1 className="text-3xl font-extrabold text-center">Hey buddy!!</h1>
       </header>
 
-      <main className="flex-1 px-6 pb-6">
+      <main className="flex-1 px-6 pb-24 pt-28">
         <div className="max-w-xl mx-auto">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2">
             {[
@@ -41,27 +46,7 @@ const Events = () => {
       </main>
 
         {/* FIXED FOOTER WITH LABELS */}
-      <footer className="flex justify-around items-center p-2 bg-white shadow-md shrink-0 border-t border-gray-200">
-        <div className="flex flex-col items-center cursor-pointer text-black" onClick={() => navigate('/')}>
-          <i className="fas fa-home text-xl"></i>
-          <span className="text-[10px] font-bold">Home</span>
-        </div>
-        
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => alert('Resources')}>
-          <i className="fa-regular fa-map"></i>
-          <span className="text-[10px] font-bold">Map</span>
-        </div>
-
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => alert('Alerts')}>
-          <i className="fas fa-bell text-xl"></i>
-          <span className="text-[10px] font-bold">Alerts</span>
-        </div>
-
-        <div className="flex flex-col items-center cursor-pointer text-gray-400" onClick={() => navigate('/profile')}>
-          <i className="fas fa-user text-xl"></i>
-          <span className="text-[10px] font-bold">Profile</span>
-        </div>
-      </footer>
+       <Footer />
     </div>
   );
 };
