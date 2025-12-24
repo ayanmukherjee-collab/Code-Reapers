@@ -86,6 +86,16 @@ const ProfilePage = () => {
                 </div>
             </div>
 
+            <Button
+                fullWidth
+                variant="primary"
+                className="!h-16 text-lg mb-4 bg-black text-white hover:bg-gray-800"
+                icon={<Shield size={24} />}
+                onClick={() => window.location.href = '/admin'}
+            >
+                Switch to Admin View
+            </Button>
+
             <Button fullWidth variant="secondary" className="!h-16 text-lg" icon={<LogOut size={24} />}>
                 Sign Out
             </Button>

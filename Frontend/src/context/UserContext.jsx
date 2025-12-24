@@ -19,10 +19,12 @@ export const UserProvider = ({ children }) => {
     // Available roles for demo
     const availableRoles = ['student', 'doctor', 'faculty'];
 
-    // Default to student, check local storage for onboarding in a real app
+    // Default to student, check local storage for onboarding
     const [currentRole, setCurrentRole] = useState('student');
     const [user, setUser] = useState(users.student);
-    const [hasOnboarded, setHasOnboarded] = useState(false); // Default false to show onboarding
+    const [hasOnboarded, setHasOnboarded] = useState(() => {
+        return localStorage.getItem('campus_connect_onboarded') === 'true';
+    });
 
     // Switch role (for demo purposes)
     const switchRole = (role) => {
@@ -35,6 +37,7 @@ export const UserProvider = ({ children }) => {
     const updateProfile = (data) => {
         setUser(prev => ({ ...prev, ...data }));
         setHasOnboarded(true);
+        localStorage.setItem('campus_connect_onboarded', 'true');
     };
 
     // Settings state

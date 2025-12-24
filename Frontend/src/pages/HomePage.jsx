@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { Card, Input } from '../components';
+import { Card, Input, ChatbotBubble } from '../components';
 import { studentContent, doctorContent, quickRoutes } from '../data/dummyData';
 import { Search, SlidersHorizontal, ChevronRight, GraduationCap, Users, Bell, MapPin, Activity, ArrowRight } from 'lucide-react';
 
@@ -199,9 +199,11 @@ const HomePage = () => {
                             ))}
                         </div>
                     </section>
-
                 </main>
             )}
+
+            {/* AI Chatbot Floating Bubble */}
+            <ChatbotBubble />
         </div>
     );
 };
