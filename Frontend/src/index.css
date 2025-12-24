@@ -1,123 +1,107 @@
 @import "tailwindcss";
-@import '@fortawesome/fontawesome-free/css/all.css';
 
-.dashboard {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  background-color: #f9f9f9;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+/* ========================================
+   CampusConnect "Radical Redesign" System
+   Mobile-First Professional Aesthetic
+   ======================================== */
+
+/* CSS Custom Properties */
+:root {
+  /* Core Colors */
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-off-white: #FAFAFA;
+  --color-input-bg: #F5F5F5;
+
+  /* Typography Scale - MASSIVE */
+  --font-display: 32px;
+  --font-h1: 28px;
+  --font-h2: 24px;
+  --font-h3: 20px;
+  --font-body: 16px;
+  --font-small: 14px;
+
+  /* Touch Targets */
+  --touch-min-height: 56px;
+
+  /* Spacing */
+  --spacing-page: 24px;
+  --spacing-section: 32px;
+
+  /* Border Radius */
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-pill: 9999px;
 }
 
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
+/* Base Reset */
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  /* Base size up from 14px default */
+  -webkit-font-smoothing: antialiased;
 }
 
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #ccc;
+body {
+  background-color: var(--color-off-white);
+  color: var(--color-black);
+}
+
+/* Utility: Hide Scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Utility: Text Classes */
+.text-display {
+  font-size: var(--font-display);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.text-title {
+  font-size: var(--font-h2);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.text-body-bold {
+  font-size: var(--font-body);
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: var(--font-body);
+  font-weight: 400;
+  color: #666;
+}
+
+/* Components Base Styles */
+.btn-base {
+  height: var(--touch-min-height);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  transition: transform 0.1s;
 }
 
-.search-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.btn-base:active {
+  transform: scale(0.98);
 }
 
-.search-bar {
-  width: 100%;
-  max-width: 300px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-.search-button {
-  background-color: transparent;
-  border: none;
-  font-size: 1.2em;
-  cursor: pointer;
-}
-
-.card-section {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.card {
-  flex: 1;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  cursor: pointer;
-}
-
-.card img {
-  width: 50px;
-  height: 50px;
-  margin-bottom: 10px;
-}
-
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.navigation-section {
-  margin-bottom: 20px;
-}
-
-.navigation-button {
-  width: 100%;
-  padding: 15px;
-  background-color: #000;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.recent-places {
-  margin-bottom: 20px;
-}
-
-.place {
-  padding: 10px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-.place span {
-  display: block;
-  color: #666;
-  font-size: 0.9em;
-}
-
-.dashboard-footer {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
-  background-color: #fff;
-  border-top: 1px solid #ddd;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+.input-base {
+  height: var(--touch-min-height);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-input-bg);
+  font-size: 16px;
 }

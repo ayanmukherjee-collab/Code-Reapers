@@ -1,26 +1,49 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './homepage.jsx'; 
-import Faculty from './faculty.jsx'; 
-import Buildings from './buildings.jsx';
-import Events from './event.jsx';
-import Profile from './profile.jsx';
-import Chatbot from './chatbot.jsx';
+import React, { useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BottomNav } from './components';
+import { HomePage, MapPage, SchedulePage, ProfilePage, FacultyPage, ClubsPage, OnboardingPage } from './pages';
+import { useUser } from './context/UserContext';
 
+/**
+ * CampusConnect App
+ * Indoor navigation and campus utility app
+ */
 function App() {
   return (
-      <Routes>
-        {/* This tells the app: if the URL  is "/", show Home */}
-        <Route path="/" element={<Home />} />
-        
-        {/* This tells the app: if the URL is "/faculty", show Faculty */}
-        <Route path="/faculty" element={<Faculty />} />
-        <Route path="/buildings" element={<Buildings />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/chatbot" element={<Chatbot />} />
-      </Routes>
+    <AppContent />
   );
 }
+
+const AppContent = () => {
+  const { hasOnboarded } = useUser();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!hasOnboarded && location.pathname !== '/onboarding') {
+      navigate('/onboarding');
+    }
+  }, [hasOnboarded, navigate, location]);
+
+  const showNav = location.pathname !== '/onboarding';
+
+  return (
+    <div className="relative min-h-screen bg-gray-50 text-base">
+      {/* Main Routes */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/faculty" element={<FacultyPage />} />
+        <Route path="/clubs" element={<ClubsPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+      </Routes>
+
+      {/* Bottom Navigation (Hidden on Onboarding) */}
+      {showNav && <BottomNav />}
+    </div>
+  );
+};
 
 export default App;
