@@ -8,7 +8,7 @@ const Home = () => {
   return (
     // h-screen ensures the app takes the full height of the viewport
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
-      
+
       {/* FIXED HEADER */}
       <header className="flex items-center justify-between p-2 bg-white shadow-md shrink-0">
         <h1 className="text-xl p-2 self-end font-bold">LocAlte</h1>
@@ -16,7 +16,7 @@ const Home = () => {
 
       {/* SCROLLABLE CONTAINER */}
       <main className="flex-1 overflow-y-auto">
-        
+
         {/* FIXED TOP SECTION (Doesn't scroll internally, but moves with main content) */}
         <section className="grid grid-cols-2 gap-2 p-6 justify-items-center">
           <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer w-36 h-36" onClick={() => handleClick('Student Interest')}>
@@ -34,6 +34,17 @@ const Home = () => {
             <img src="/assets/building.png" alt="Buildings" className="w-full h-24 object-cover" />
             <p className="text-center p-1 text-sm font-medium">Buildings</p>
           </div>
+        </section>
+
+        {/* Floor Plan Scanner Button */}
+        <section className="px-4 mb-4">
+          <button
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-3 rounded-md flex flex-col items-center hover:from-purple-700 hover:to-blue-700 transition-all"
+            onClick={() => window.navigateTo('scanner')}
+          >
+            <span className="text-xl text-white">🏗️ AI Floor Plan Scanner</span>
+            <span className="text-sm text-gray-200">Upload & detect rooms, walls, doors</span>
+          </button>
         </section>
 
         <section className="px-4 mb-4">
@@ -63,7 +74,7 @@ const Home = () => {
       {/* FIXED FOOTER */}
       <footer className="flex justify-around items-center p-4 bg-white shadow-md shrink-0 border-t border-gray-200">
         <div className="text-2xl cursor-pointer"><i className="fas fa-home"></i></div>
-        
+
         <div className="text-2xl cursor-pointer"><i className="fas fa-folder"></i></div>
         <div className="text-2xl cursor-pointer"><i className="fas fa-bell"></i></div>
         <div className="text-2xl cursor-pointer"><i className="fas fa-user"></i></div>

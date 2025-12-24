@@ -1,54 +1,68 @@
 """
-Floor Plan Detection API - mmdetection Version
+Floor Plan Detection API - Roboflow Version
 
-FastAPI server using mmdetection for detecting walls and rooms in architectural floor plans.
-Based on the reference implementation from floorplan-detection-main.
+FastAPI server using Roboflow's InferenceHTTPClient for detecting 
+floor plan elements using a custom trained model.
 
 Usage:
-    python run.py --model cascade_swin --port 5000
+    python run.py --port 5000
     
 API Endpoints:
     GET  /           - Visualizer interface
     POST /run-inference - Analyze a floor plan image
     GET  /health     - Health check
+
+Environment Variables:
+    ROBOFLOW_API_KEY - Your Roboflow private API key
+    ROBOFLOW_WORKSPACE - Workspace name (default: test-b5rtm)
+    ROBOFLOW_WORKFLOW_ID - Workflow ID (default: classify-and-conditionally-detect)
 """
 
 import os
-import json
 import argparse
+import base64
 import numpy as np
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import cv2
 import logging
+from pydantic import BaseModel
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Get the directory where run.py is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_DIR = os.path.join(BASE_DIR, "configs")
-WEIGHTS_DIR = os.path.join(BASE_DIR, "weights")
 
-# Try to import mmdetection
+# Try to import Roboflow inference SDK
 try:
-    import torch
-    from mmdet.apis import init_detector, inference_detector
-    MMDET_AVAILABLE = True
+    from inference_sdk import InferenceHTTPClient
+    ROBOFLOW_AVAILABLE = True
 except ImportError:
-    MMDET_AVAILABLE = False
-    print("⚠️ mmdetection not available. Install with: pip install mmdet mmcv mmengine torch")
+    ROBOFLOW_AVAILABLE = False
+    print("⚠️ inference-sdk not available. Install with: pip install inference-sdk")
 
-# Fallback imports for OpenCV-based detection
-if not MMDET_AVAILABLE:
-    from utils.preprocessing import preprocess_floor_plan
-    from utils.wall_detector import detect_walls as cv_detect_walls
-    from utils.room_detector import detect_rooms as cv_detect_rooms
-    from utils.door_detector import detect_doors as cv_detect_doors
+# Roboflow configuration
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "mXkh9oZq1P6F4LjrrsBD")
+ROBOFLOW_WORKSPACE = os.getenv("ROBOFLOW_WORKSPACE", "test-b5rtm")
+
+# Room detection workflow (detect-and-classify)
+ROBOFLOW_ROOM_WORKFLOW_ID = os.getenv("ROBOFLOW_ROOM_WORKFLOW_ID", "detect-and-classify")
+
+# Door detection model (floor_plan_multiple)
+ROBOFLOW_DOOR_MODEL_ID = os.getenv("ROBOFLOW_DOOR_MODEL_ID", "floor_plan_multiple-hgrp2/1")
+
+# Legacy workflow (kept for backward compatibility)
+ROBOFLOW_WORKFLOW_ID = os.getenv("ROBOFLOW_WORKFLOW_ID", "detect-and-classify")
+ROBOFLOW_API_URL = "https://serverless.roboflow.com"
 
 app = FastAPI(
     title="Floor Plan Detection API",
-    description="Detects walls, rooms, and doors in architectural floor plans using mmdetection",
-    version="2.1.0"
+    description="Detects floor plan elements using Roboflow custom trained model",
+    version="3.0.0"
 )
 
 # Add CORS middleware
@@ -65,180 +79,137 @@ logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
-MODEL_TYPES = {
-    "cascade_swin": "cascade_swin.py",
-    "faster_rcnn": "faster_rcnn.py",
-    "retinanet": "retinanet.py",
-}
-
-global_model = None
-global_device = None
-using_mmdet = False
+# Initialize Roboflow client
+roboflow_client = None
 
 
-def determine_device():
-    """Determine the best available device (CUDA or CPU)."""
-    if not MMDET_AVAILABLE:
-        return "cpu"
+def initialize_roboflow_client():
+    """Initialize the Roboflow InferenceHTTPClient."""
+    global roboflow_client
     
-    import torch
-    if torch.cuda.is_available():
-        try:
-            torch.cuda.init()
-            return "cuda:0"
-        except Exception as e:
-            logger.warning(f"CUDA initialization failed: {str(e)}. Falling back to CPU.")
-    return "cpu"
-
-
-def load_model(model_type: str):
-    """Load mmdetection model."""
-    global global_device, using_mmdet
-    
-    if not MMDET_AVAILABLE:
-        logger.warning("mmdetection not available, using OpenCV fallback")
-        using_mmdet = False
+    if not ROBOFLOW_AVAILABLE:
+        logger.warning("Roboflow SDK not available")
         return None
     
-    if model_type not in MODEL_TYPES:
-        raise ValueError(f"Unsupported model type: {model_type}")
-    
-    config_file = os.path.join(CONFIG_DIR, MODEL_TYPES[model_type])
-    checkpoint_file = os.path.join(WEIGHTS_DIR, f"{model_type}_latest.pth")
-    
-    if not os.path.exists(config_file):
-        raise FileNotFoundError(f"Config file not found: {config_file}")
-    
-    if not os.path.exists(checkpoint_file):
-        raise FileNotFoundError(
-            f"Model weights not found: {checkpoint_file}\n"
-            f"Please download from: https://drive.google.com/drive/folders/1MgW3Qo-8K4OrHi4ebvYd-81cTqQxwLgz"
-        )
+    if not ROBOFLOW_API_KEY:
+        logger.warning("ROBOFLOW_API_KEY not set")
+        return None
     
     try:
-        global_device = determine_device()
-        model = init_detector(config_file, checkpoint_file, device=global_device)
-        logger.info(f"Model {model_type} loaded successfully on {global_device}")
-        using_mmdet = True
-        return model
+        roboflow_client = InferenceHTTPClient(
+            api_url=ROBOFLOW_API_URL,
+            api_key=ROBOFLOW_API_KEY
+        )
+        logger.info(f"✅ Roboflow client initialized successfully")
+        logger.info(f"   Workspace: {ROBOFLOW_WORKSPACE}")
+        logger.info(f"   Workflow: {ROBOFLOW_WORKFLOW_ID}")
+        return roboflow_client
     except Exception as e:
-        logger.error(f"Failed to load model {model_type} on {global_device}: {str(e)}")
-        if global_device == "cuda:0":
-            logger.info("Attempting to load model on CPU")
-            global_device = "cpu"
-            model = init_detector(config_file, checkpoint_file, device=global_device)
-            logger.info(f"Model {model_type} loaded successfully on CPU")
-            using_mmdet = True
-            return model
-        else:
-            raise
+        logger.error(f"Failed to initialize Roboflow client: {str(e)}")
+        return None
 
 
-def process_mmdet_result(result) -> Dict[str, Any]:
-    """Process mmdetection inference result into JSON format."""
-    bboxes = result.pred_instances.bboxes.cpu().numpy()
-    labels = result.pred_instances.labels.cpu().numpy()
-    scores = result.pred_instances.scores.cpu().numpy()
+def process_roboflow_result(result: Dict, image_width: int, image_height: int) -> Dict[str, Any]:
+    """
+    Process Roboflow workflow result into our standard JSON format.
     
+    The result structure depends on your Roboflow workflow configuration.
+    This function maps the Roboflow output to our expected format.
+    """
     walls = []
     rooms = []
+    doors = []
     
-    for i, (bbox, label, score) in enumerate(zip(bboxes, labels, scores)):
-        x1, y1, x2, y2 = bbox
+    # Extract predictions from result
+    # The structure depends on your Roboflow workflow - adjust as needed
+    predictions = []
+    
+    # Handle different result structures from Roboflow
+    if isinstance(result, dict):
+        if 'predictions' in result:
+            predictions = result['predictions']
+        elif 'output' in result:
+            # Workflow output format
+            output = result['output']
+            if isinstance(output, list):
+                for item in output:
+                    if 'predictions' in item:
+                        predictions.extend(item['predictions'])
+            elif isinstance(output, dict) and 'predictions' in output:
+                predictions = output['predictions']
+        
+        # Also check for direct detection results
+        if 'detections' in result:
+            predictions = result['detections']
+    elif isinstance(result, list):
+        predictions = result
+    
+    logger.info(f"Processing {len(predictions)} predictions from Roboflow")
+    
+    for i, pred in enumerate(predictions):
+        # Get bounding box
+        x = pred.get('x', 0)
+        y = pred.get('y', 0)
+        width = pred.get('width', 0)
+        height = pred.get('height', 0)
+        
+        # Calculate corners (Roboflow returns center x,y)
+        x1 = x - width / 2
+        y1 = y - height / 2
+        x2 = x + width / 2
+        y2 = y + height / 2
+        
+        confidence = pred.get('confidence', 0.8)
+        class_name = pred.get('class', '').lower()
+        
         item = {
-            "id": f"{'wall' if label == 0 else 'room'}_{i+1}",
+            "id": f"{class_name}_{i+1}",
             "position": {
                 "start": {"x": float(x1), "y": float(y1)},
                 "end": {"x": float(x2), "y": float(y2)}
             },
-            "confidence": float(score)
+            "confidence": float(confidence),
+            "class": class_name
         }
         
-        if label == 0:
+        # Categorize based on class name
+        if 'wall' in class_name:
             walls.append(item)
-        else:
-            # Add room-specific fields
-            item["name"] = f"Room {len(rooms) + 1}"
-            item["center"] = {
-                "x": float((x1 + x2) / 2),
-                "y": float((y1 + y2) / 2)
-            }
-            item["area"] = float((x2 - x1) * (y2 - y1))
+        elif 'door' in class_name:
+            doors.append({
+                "id": f"door_{len(doors)+1}",
+                "hinge": {"x": float(x), "y": float(y)},
+                "swing_angle": 90,
+                "radius": float(max(width, height) / 2),
+                "confidence": float(confidence)
+            })
+        elif 'room' in class_name or 'space' in class_name:
+            item["name"] = pred.get('class', f'Room {len(rooms)+1}')
+            item["center"] = {"x": float(x), "y": float(y)}
+            item["area"] = float(width * height)
             rooms.append(item)
-    
-    return {
-        "type": "floor_plan",
-        "confidence": float(np.mean(scores)) if len(scores) > 0 else 0.0,
-        "detectionResults": {
-            "walls": walls,
-            "rooms": rooms,
-            "doors": []  # mmdetection doesn't detect doors, would need separate detection
-        }
-    }
-
-
-def process_opencv_result(img, image_width, image_height) -> Dict[str, Any]:
-    """Process image using OpenCV fallback detection."""
-    preprocessed = preprocess_floor_plan(img)
-    walls = cv_detect_walls(preprocessed['binary'], preprocessed['edges'])
-    rooms = cv_detect_rooms(preprocessed['binary'], walls, image_width, image_height)
-    doors = cv_detect_doors(preprocessed['gray'], walls)
-    
-    # Format walls
-    formatted_walls = []
-    for i, wall in enumerate(walls):
-        formatted_walls.append({
-            "id": f"wall_{i+1}",
-            "position": {
-                "start": {"x": float(wall['x1']), "y": float(wall['y1'])},
-                "end": {"x": float(wall['x2']), "y": float(wall['y2'])}
-            },
-            "confidence": float(wall.get('confidence', 0.8))
-        })
-    
-    # Format rooms
-    formatted_rooms = []
-    for i, room in enumerate(rooms):
-        formatted_rooms.append({
-            "id": f"room_{i+1}",
-            "name": room.get('name', f'Room {i+1}'),
-            "position": {
-                "start": {"x": float(room['x']), "y": float(room['y'])},
-                "end": {"x": float(room['x'] + room['width']), "y": float(room['y'] + room['height'])}
-            },
-            "center": {
-                "x": float(room['x'] + room['width'] / 2),
-                "y": float(room['y'] + room['height'] / 2)
-            },
-            "area": float(room['width'] * room['height']),
-            "confidence": float(room.get('confidence', 0.75))
-        })
-    
-    # Format doors
-    formatted_doors = []
-    for i, door in enumerate(doors):
-        formatted_doors.append({
-            "id": f"door_{i+1}",
-            "hinge": {"x": float(door['hinge'][0]), "y": float(door['hinge'][1])},
-            "swing_angle": float(door.get('swing_end', 90)),
-            "radius": float(door.get('radius', 30)),
-            "confidence": float(door.get('confidence', 0.7))
-        })
+        else:
+            # Default: treat as a room/space if not wall or door
+            item["name"] = pred.get('class', f'Area {len(rooms)+1}')
+            item["center"] = {"x": float(x), "y": float(y)}
+            item["area"] = float(width * height)
+            rooms.append(item)
     
     all_confidences = (
         [w.get('confidence', 0.8) for w in walls] +
-        [r.get('confidence', 0.75) for r in rooms] +
-        [d.get('confidence', 0.7) for d in doors]
+        [r.get('confidence', 0.8) for r in rooms] +
+        [d.get('confidence', 0.8) for d in doors]
     )
     
     return {
         "type": "floor_plan",
         "confidence": float(np.mean(all_confidences)) if all_confidences else 0.0,
         "detectionResults": {
-            "walls": formatted_walls,
-            "rooms": formatted_rooms,
-            "doors": formatted_doors
-        }
+            "walls": walls,
+            "rooms": rooms,
+            "doors": doors
+        },
+        "rawResult": result  # Include raw result for debugging
     }
 
 
@@ -250,15 +221,22 @@ async def root():
         with open(visualizer_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     
+    status = "✅ Connected" if roboflow_client else "❌ Not Connected"
     return HTMLResponse(content=f"""
         <html>
             <head><title>Floor Plan Detection API</title></head>
             <body style="font-family: sans-serif; padding: 40px; background: #1a1a2e; color: #fff;">
                 <h1>🏗️ Floor Plan Detection API</h1>
-                <p>API is running. Using: <strong>{'mmdetection' if using_mmdet else 'OpenCV (fallback)'}</strong></p>
+                <p>API is running with <strong>Roboflow</strong> backend</p>
+                <p>Roboflow Status: <strong>{status}</strong></p>
                 <ul>
                     <li><code>GET /health</code> - Health check</li>
                     <li><code>POST /run-inference</code> - Run floor plan detection</li>
+                </ul>
+                <h3>Configuration:</h3>
+                <ul>
+                    <li>Workspace: <code>{ROBOFLOW_WORKSPACE}</code></li>
+                    <li>Workflow: <code>{ROBOFLOW_WORKFLOW_ID}</code></li>
                 </ul>
             </body>
         </html>
@@ -270,23 +248,32 @@ async def health_check():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "version": "2.1.0",
-        "backend": "mmdetection" if using_mmdet else "opencv",
-        "device": global_device or "cpu"
+        "version": "3.0.0",
+        "backend": "roboflow",
+        "roboflow_connected": roboflow_client is not None,
+        "workspace": ROBOFLOW_WORKSPACE,
+        "workflow": ROBOFLOW_WORKFLOW_ID
     }
 
 
 @app.post("/run-inference")
 async def run_inference(image: UploadFile = File(...)):
-    """Run floor plan detection on an uploaded image."""
+    """Run floor plan detection on an uploaded image using Roboflow."""
     if image.content_type not in ["image/jpeg", "image/png"]:
         raise HTTPException(status_code=400, detail="Only JPEG and PNG images are supported.")
+    
+    if not roboflow_client:
+        raise HTTPException(
+            status_code=503, 
+            detail="Roboflow client not initialized. Check ROBOFLOW_API_KEY."
+        )
     
     try:
         contents = await image.read()
         if len(contents) > MAX_FILE_SIZE:
             raise HTTPException(status_code=400, detail="File size exceeds the maximum limit of 10 MB.")
         
+        # Decode image to get dimensions
         nparr = np.frombuffer(contents, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if img is None:
@@ -295,19 +282,33 @@ async def run_inference(image: UploadFile = File(...)):
         image_height, image_width = img.shape[:2]
         logger.info(f"Processing image: {image_width}x{image_height}")
         
-        if using_mmdet and global_model is not None:
-            # Use mmdetection
-            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            result = inference_detector(global_model, img_rgb)
-            processed_result = process_mmdet_result(result)
-        else:
-            # Use OpenCV fallback
-            processed_result = process_opencv_result(img, image_width, image_height)
+        # Encode image to base64 for Roboflow
+        _, buffer = cv2.imencode('.jpg', img)
+        img_base64 = base64.b64encode(buffer).decode('utf-8')
         
+        # Run Roboflow workflow
+        logger.info(f"Sending to Roboflow workflow: {ROBOFLOW_WORKFLOW_ID}")
+        result = roboflow_client.run_workflow(
+            workspace_name=ROBOFLOW_WORKSPACE,
+            workflow_id=ROBOFLOW_WORKFLOW_ID,
+            images={
+                "image": img_base64
+            },
+            use_cache=True
+        )
+        
+        logger.info(f"Roboflow response received")
+        
+        # Process the result
+        processed_result = process_roboflow_result(result, image_width, image_height)
         processed_result["imageSize"] = {"width": image_width, "height": image_height}
         
+        # Remove raw result from final output (uncomment below to include for debugging)
+        # del processed_result["rawResult"]
+        
         logger.info(f"Detection complete: {len(processed_result['detectionResults']['walls'])} walls, "
-                   f"{len(processed_result['detectionResults']['rooms'])} rooms")
+                   f"{len(processed_result['detectionResults']['rooms'])} rooms, "
+                   f"{len(processed_result['detectionResults']['doors'])} doors")
         
         return processed_result
         
@@ -318,33 +319,466 @@ async def run_inference(image: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"An error occurred during inference: {str(e)}")
 
 
+# ============================================================================
+# ROBOFLOW WORKFLOW DETECTION ENDPOINT
+# ============================================================================
+
+class RoboflowDetectionParams(BaseModel):
+    """Parameters for Roboflow detection."""
+    confidence: Optional[float] = 40  # Confidence threshold (0-100)
+    overlap: Optional[float] = 30     # Overlap/NMS threshold (0-100)
+
+
+@app.post("/detect-roboflow")
+async def detect_roboflow(
+    image: UploadFile = File(...),
+    confidence: float = 40,
+    overlap: float = 30
+):
+    """
+    Detect floor plan elements using Roboflow's detect-and-classify workflow.
+    
+    Uses the ML model for room detection with adjustable thresholds.
+    
+    Args:
+        image: Floor plan image
+        confidence: Confidence threshold (0-100), default 40
+        overlap: Overlap/NMS threshold (0-100), default 30
+        
+    Returns:
+        Detections and navigation graph
+    """
+    if not roboflow_client:
+        raise HTTPException(status_code=500, detail="Roboflow client not available")
+    
+    try:
+        # Validate and read image
+        if not image.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        contents = await image.read()
+        if len(contents) > MAX_FILE_SIZE:
+            raise HTTPException(status_code=400, detail="File size exceeds limit")
+        
+        # Decode image dimensions
+        nparr = np.frombuffer(contents, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if img is None:
+            raise HTTPException(status_code=400, detail="Could not decode image")
+        
+        image_height, image_width = img.shape[:2]
+        
+        # Encode to base64
+        img_base64 = base64.b64encode(contents).decode('utf-8')
+        
+        logger.info(f"Sending to Roboflow direct detection API")
+        logger.info(f"Model: {ROBOFLOW_DOOR_MODEL_ID}")
+        logger.info(f"Thresholds - Confidence: {confidence}%, Overlap: {overlap}%")
+        
+        # Use direct detection API instead of workflow (workflow has incompatible model)
+        import requests
+        
+        detect_url = f"https://detect.roboflow.com/{ROBOFLOW_DOOR_MODEL_ID}"
+        params = {
+            "api_key": ROBOFLOW_API_KEY,
+            "confidence": confidence / 100.0,
+            "overlap": overlap / 100.0
+        }
+        
+        response = requests.post(
+            detect_url,
+            params=params,
+            data=img_base64,
+            headers={"Content-Type": "application/x-www-form-urlencoded"}
+        )
+        
+        if response.status_code != 200:
+            logger.error(f"Roboflow API error: {response.status_code} - {response.text}")
+            raise HTTPException(status_code=response.status_code, detail=f"Roboflow API error: {response.text}")
+        
+        result = response.json()
+        logger.info(f"Roboflow response received")
+        
+        # Process predictions with confidence threshold
+        rooms = []
+        doors = []
+        walls = []
+        
+        predictions = []
+        
+        # Extract predictions from Roboflow response
+        if isinstance(result, list) and len(result) > 0:
+            for item in result:
+                if isinstance(item, dict):
+                    if 'predictions' in item:
+                        predictions.extend(item.get('predictions', []))
+                    elif 'output' in item:
+                        output = item['output']
+                        if isinstance(output, dict) and 'predictions' in output:
+                            predictions.extend(output['predictions'])
+        elif isinstance(result, dict):
+            if 'predictions' in result:
+                predictions = result['predictions']
+        
+        logger.info(f"Processing {len(predictions)} predictions")
+        
+        conf_threshold = confidence / 100.0
+        overlap_threshold = overlap / 100.0
+        
+        for i, pred in enumerate(predictions):
+            pred_conf = pred.get('confidence', 0)
+            
+            # Apply confidence threshold
+            if pred_conf < conf_threshold:
+                continue
+            
+            x = pred.get('x', 0)
+            y = pred.get('y', 0)
+            width = pred.get('width', 0)
+            height = pred.get('height', 0)
+            
+            x1 = x - width / 2
+            y1 = y - height / 2
+            x2 = x + width / 2
+            y2 = y + height / 2
+            
+            class_name = pred.get('class', '').lower()
+            
+            item_data = {
+                "id": f"{class_name}_{i+1}",
+                "name": pred.get('class', f'Room {i+1}'),
+                "position": {
+                    "start": {"x": float(x1), "y": float(y1)},
+                    "end": {"x": float(x2), "y": float(y2)}
+                },
+                "center": {"x": float(x), "y": float(y)},
+                "area": float(width * height),
+                "confidence": float(pred_conf),
+                "class": class_name,
+                "type": "room" if 'room' in class_name or 'space' in class_name else class_name
+            }
+            
+            # Categorize by class name
+            if 'door' in class_name:
+                doors.append({
+                    "id": f"door_{len(doors)+1}",
+                    "hinge": {"x": float(x), "y": float(y)},
+                    "width": float(max(width, height)),
+                    "swing_angle": 90,
+                    "confidence": float(pred_conf),
+                    "type": "door"
+                })
+            elif 'wall' in class_name:
+                walls.append({
+                    "id": f"wall_{len(walls)+1}",
+                    "position": {
+                        "start": {"x": float(x1), "y": float(y1)},
+                        "end": {"x": float(x2), "y": float(y2)}
+                    },
+                    "confidence": float(pred_conf),
+                    "type": "wall"
+                })
+            else:
+                # Treat as room/space
+                rooms.append(item_data)
+        
+        # Apply NMS (Non-Maximum Suppression) to remove overlaps
+        rooms = apply_nms(rooms, overlap_threshold)
+        
+        detections = {
+            "rooms": rooms,
+            "doors": doors,
+            "walls": walls,
+            "hallways": [],
+            "stairs": [],
+            "texts": [],
+            "imageSize": {"width": image_width, "height": image_height}
+        }
+        
+        # Build navigation graph
+        if UNIFIED_DETECTOR_AVAILABLE:
+            detector = FloorPlanDetector()
+            graph = detector.build_navigation_graph(detections)
+        else:
+            graph = {"nodes": [], "edges": [], "metadata": {}}
+        
+        logger.info(f"Roboflow detection complete: {len(rooms)} rooms, {len(doors)} doors")
+        
+        return {
+            "success": True,
+            "detections": detections,
+            "navigationGraph": graph,
+            "thresholds": {
+                "confidence": confidence,
+                "overlap": overlap
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Roboflow detection error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def apply_nms(items: List[Dict], threshold: float) -> List[Dict]:
+    """Apply Non-Maximum Suppression to filter overlapping detections."""
+    if not items:
+        return items
+    
+    # Sort by confidence descending
+    sorted_items = sorted(items, key=lambda x: x.get('confidence', 0), reverse=True)
+    
+    kept = []
+    for item in sorted_items:
+        overlap_found = False
+        for kept_item in kept:
+            iou = calculate_iou(item, kept_item)
+            if iou > threshold:
+                overlap_found = True
+                break
+        if not overlap_found:
+            kept.append(item)
+    
+    return kept
+
+
+def calculate_iou(box1: Dict, box2: Dict) -> float:
+    """Calculate Intersection over Union for two boxes."""
+    x1_1 = box1["position"]["start"]["x"]
+    y1_1 = box1["position"]["start"]["y"]
+    x2_1 = box1["position"]["end"]["x"]
+    y2_1 = box1["position"]["end"]["y"]
+    
+    x1_2 = box2["position"]["start"]["x"]
+    y1_2 = box2["position"]["start"]["y"]
+    x2_2 = box2["position"]["end"]["x"]
+    y2_2 = box2["position"]["end"]["y"]
+    
+    x_left = max(x1_1, x1_2)
+    y_top = max(y1_1, y1_2)
+    x_right = min(x2_1, x2_2)
+    y_bottom = min(y2_1, y2_2)
+    
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0
+    
+    intersection = (x_right - x_left) * (y_bottom - y_top)
+    area1 = (x2_1 - x1_1) * (y2_1 - y1_1)
+    area2 = (x2_2 - x1_2) * (y2_2 - y1_2)
+    union = area1 + area2 - intersection
+    
+    return intersection / union if union > 0 else 0.0
+
+
+# ============================================================================
+# UNIFIED DETECTION + PATHFINDING ENDPOINTS
+# ============================================================================
+
+# Import unified detector and pathfinder
+try:
+    from unified_detector import FloorPlanDetector
+    from pathfinder import find_path, find_path_by_name, get_directions, search_nodes_by_name
+    UNIFIED_DETECTOR_AVAILABLE = True
+except ImportError as e:
+    UNIFIED_DETECTOR_AVAILABLE = False
+    logger.warning(f"Unified detector not available: {e}")
+
+
+@app.post("/detect-unified")
+async def detect_unified(image: UploadFile = File(...)):
+    """
+    Run unified detection pipeline (OpenCV + OCR).
+    
+    Returns walls, rooms with names, doors, hallways, stairs, and navigation graph.
+    This provides better room detection than Roboflow alone.
+    """
+    if not UNIFIED_DETECTOR_AVAILABLE:
+        raise HTTPException(status_code=500, detail="Unified detector not available")
+    
+    try:
+        # Validate and read image
+        if not image.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        contents = await image.read()
+        if len(contents) > MAX_FILE_SIZE:
+            raise HTTPException(status_code=400, detail="File size exceeds limit")
+        
+        # Decode image
+        nparr = np.frombuffer(contents, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if img is None:
+            raise HTTPException(status_code=400, detail="Could not decode image")
+        
+        logger.info(f"Processing image: {image.filename} ({img.shape[1]}x{img.shape[0]})")
+        
+        # Run unified detection
+        detector = FloorPlanDetector()
+        detections = detector.detect_all(img)
+        
+        # Build navigation graph
+        graph = detector.build_navigation_graph(detections)
+        
+        logger.info(f"Unified detection complete: {len(detections['rooms'])} rooms, "
+                   f"{len(graph['nodes'])} nodes, {len(graph['edges'])} edges")
+        
+        return {
+            "success": True,
+            "detections": detections,
+            "navigationGraph": graph
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unified detection error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/find-path")
+async def api_find_path(start_id: str, end_id: str, algorithm: str = "astar"):
+    """
+    Find path between two nodes by ID.
+    
+    Requires a previous call to /detect-unified to build the graph.
+    """
+    # This is a simplified version - in production you'd store the graph in session/DB
+    raise HTTPException(status_code=501, detail="Use /pathfind-by-name with the graph from /detect-unified")
+
+
+from pydantic import BaseModel
+from typing import Optional
+
+class PathfindRequest(BaseModel):
+    graph: Dict[str, Any]  # Navigation graph from detect-unified
+    start_query: str       # Search query for start location
+    end_query: str         # Search query for destination
+    algorithm: Optional[str] = "astar"  # "astar" or "dijkstra"
+
+
+@app.post("/pathfind")
+async def api_pathfind(request: PathfindRequest):
+    """
+    Find path between two locations by name search.
+    
+    Args:
+        graph: Navigation graph from /detect-unified response
+        start_query: Room name/number to start from (e.g. "101", "Lab")
+        end_query: Room name/number to go to
+        algorithm: "astar" (default) or "dijkstra"
+    
+    Returns:
+        Path with node list, total distance, and turn-by-turn directions
+    """
+    if not UNIFIED_DETECTOR_AVAILABLE:
+        raise HTTPException(status_code=500, detail="Pathfinder not available")
+    
+    try:
+        result = find_path_by_name(
+            request.graph, 
+            request.start_query, 
+            request.end_query,
+            request.algorithm
+        )
+        
+        if result.get("found"):
+            result["directions"] = get_directions(result)
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Pathfinding error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class SearchRequest(BaseModel):
+    graph: Dict[str, Any]
+    query: str
+
+
+@app.post("/search-nodes")
+async def api_search_nodes(request: SearchRequest):
+    """
+    Search for nodes by name.
+    
+    Returns list of matching rooms/locations for autocomplete.
+    """
+    if not UNIFIED_DETECTOR_AVAILABLE:
+        raise HTTPException(status_code=500, detail="Search not available")
+    
+    try:
+        matches = search_nodes_by_name(request.graph, request.query)
+        return {
+            "query": request.query,
+            "results": [
+                {"id": m["id"], "name": m.get("name", m["id"]), "type": m.get("type")}
+                for m in matches[:20]  # Limit to 20 results
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class EditableGraphRequest(BaseModel):
+    """Request model for rebuilding graph from edited detections."""
+    detections: Dict[str, Any]  # Modified detections (rooms, doors, hallways, walls)
+
+
+@app.post("/rebuild-graph")
+async def rebuild_graph(request: EditableGraphRequest):
+    """
+    Rebuild navigation graph from user-edited detection data.
+    
+    Users can:
+    - Add/edit/delete rooms
+    - Add/edit/delete doors
+    - Add/edit/delete hallways
+    - Modify connections
+    
+    The backend rebuilds the graph from the modified detections.
+    """
+    if not UNIFIED_DETECTOR_AVAILABLE:
+        raise HTTPException(status_code=500, detail="Detector not available")
+    
+    try:
+        detector = FloorPlanDetector()
+        
+        # Build graph from user-provided detections
+        graph = detector.build_navigation_graph(request.detections)
+        
+        logger.info(f"Rebuilt graph: {graph['metadata']['nodeCount']} nodes, "
+                   f"{graph['metadata']['edgeCount']} edges")
+        
+        return {
+            "success": True,
+            "navigationGraph": graph
+        }
+        
+    except Exception as e:
+        logger.error(f"Graph rebuild error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 def main():
     """Main entry point."""
     import uvicorn
     
-    parser = argparse.ArgumentParser(description="Run Floor Plan Detection API")
-    parser.add_argument("--model", type=str, choices=list(MODEL_TYPES.keys()), 
-                       default="cascade_swin", help="Model type to use")
+    parser = argparse.ArgumentParser(description="Run Floor Plan Detection API with Roboflow")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run on")
     parser.add_argument("--port", type=int, default=5000, help="Port to run on")
     args = parser.parse_args()
     
-    global global_model
+    # Initialize Roboflow client
+    initialize_roboflow_client()
     
-    if MMDET_AVAILABLE:
-        try:
-            global_model = load_model(args.model)
-            logger.info(f"Starting server with {args.model} model on device: {global_device}")
-        except FileNotFoundError as e:
-            logger.warning(f"Model not loaded: {str(e)}")
-            logger.info("Running with OpenCV fallback detection")
-        except Exception as e:
-            logger.error(f"Failed to initialize model: {str(e)}")
-            logger.info("Running with OpenCV fallback detection")
+    if roboflow_client:
+        logger.info(f"🚀 Starting Floor Plan Detection API with Roboflow backend")
     else:
-        logger.info("mmdetection not available, using OpenCV fallback")
+        logger.warning("⚠️ Roboflow client not available - API will return errors")
     
-    logger.info(f"Starting Floor Plan Detection API on {args.host}:{args.port}")
+    logger.info(f"Starting server on {args.host}:{args.port}")
     uvicorn.run(app, host=args.host, port=args.port)
 
 
