@@ -46,7 +46,7 @@ except ImportError:
     print("⚠️ inference-sdk not available. Install with: pip install inference-sdk")
 
 # Roboflow configuration
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "mXkh9oZq1P6F4LjrrsBD")
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 ROBOFLOW_WORKSPACE = os.getenv("ROBOFLOW_WORKSPACE", "test-b5rtm")
 
 # Room detection workflow (detect-and-classify)
