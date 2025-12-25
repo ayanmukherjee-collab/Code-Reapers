@@ -8,7 +8,7 @@ const AdminLayout = () => {
 
     const menuItems = [
         { id: 'dashboard', label: 'Home', icon: LayoutDashboard, path: '/admin' },
-        { id: 'buildings', label: 'Builds', icon: Building2, path: '/admin/buildings' },
+        { id: 'buildings', label: 'Buildings', icon: Building2, path: '/admin/buildings' },
         { id: 'personnel', label: 'Users', icon: Users, path: '/admin/personnel' },
         { id: 'schedule', label: 'Plan', icon: Calendar, path: '/admin/schedule' },
         { id: 'broadcast', label: 'Alerts', icon: Radio, path: '/admin/broadcast' },
