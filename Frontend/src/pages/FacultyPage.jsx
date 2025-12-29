@@ -68,7 +68,12 @@ const FacultyPage = () => {
                                 <Button variant="secondary" className="flex-1 !h-12 !text-sm" icon={<Mail size={18} />}>
                                     Email
                                 </Button>
-                                <Button variant="secondary" className="flex-1 !h-12 !text-sm" icon={<MapPin size={18} />}>
+                                <Button
+                                    variant="secondary"
+                                    className="flex-1 !h-12 !text-sm"
+                                    icon={<MapPin size={18} />}
+                                    onClick={() => navigate(`/map?destination=${prof.roomId}&name=${encodeURIComponent(prof.room)}`)}
+                                >
                                     Locate
                                 </Button>
                             </div>

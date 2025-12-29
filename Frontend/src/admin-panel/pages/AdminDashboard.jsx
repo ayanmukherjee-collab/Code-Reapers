@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAdmin } from '../context/AdminContext';
-import { Building2, Users, Calendar, Radio, Plus, ArrowRight, Activity, TrendingUp } from 'lucide-react';
+import { Building2, Users, Calendar, Radio, Plus, ArrowRight, Activity, TrendingUp, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -20,6 +20,7 @@ const AdminDashboard = () => {
         { label: 'Add Building', icon: Plus, action: () => navigate('/admin/buildings') },
         { label: 'Manage Staff', icon: Users, action: () => navigate('/admin/personnel') },
         { label: 'Create Alert', icon: Radio, action: () => navigate('/admin/broadcast') },
+        { label: 'Manage Organization', icon: Settings, action: () => navigate('/admin/setup') },
     ];
 
     return (

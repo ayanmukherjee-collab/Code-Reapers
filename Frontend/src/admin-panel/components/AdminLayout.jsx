@@ -7,11 +7,12 @@ const AdminLayout = () => {
     const location = useLocation();
 
     const menuItems = [
-        { id: 'dashboard', label: 'Home', icon: LayoutDashboard, path: '/admin' },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
         { id: 'buildings', label: 'Buildings', icon: Building2, path: '/admin/buildings' },
-        { id: 'personnel', label: 'Users', icon: Users, path: '/admin/personnel' },
-        { id: 'schedule', label: 'Plan', icon: Calendar, path: '/admin/schedule' },
+        { id: 'personnel', label: 'Personnel', icon: Users, path: '/admin/personnel' },
+        { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/admin/schedule' },
         { id: 'broadcast', label: 'Alerts', icon: Radio, path: '/admin/broadcast' },
+        { id: 'setup', label: 'Organization', icon: Settings, path: '/admin/setup' },
     ];
 
     return (
@@ -38,7 +39,7 @@ const AdminLayout = () => {
                                 `}
                             >
                                 <Icon size={20} />
-                                <span>{item.label === 'Home' ? 'Dashboard' : item.label === 'Builds' ? 'Buildings' : item.label === 'Users' ? 'Personnel' : item.label === 'Plan' ? 'Schedule' : 'Broadcast'}</span>
+                                <span>{item.label}</span>
                             </button>
                         );
                     })}

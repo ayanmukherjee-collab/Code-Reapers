@@ -1,0 +1,25 @@
+[
+    {
+        "origin": [
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "https://campus-connect-985d7.web.app",
+            "https://campus-connect-985d7.firebaseapp.com"
+        ],
+        "method": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE",
+            "HEAD"
+        ],
+        "maxAgeSeconds": 3600,
+        "responseHeader": [
+            "Content-Type",
+            "Authorization",
+            "Content-Length",
+            "User-Agent",
+            "x-goog-resumable"
+        ]
+    }
+]

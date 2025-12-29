@@ -256,6 +256,53 @@ async def health_check():
     }
 
 
+# ============================================================================
+# CHATBOT ENDPOINT
+# ============================================================================
+
+try:
+    from chatbot import process_message
+    CHATBOT_AVAILABLE = True
+except ImportError:
+    CHATBOT_AVAILABLE = False
+    logger.warning("Chatbot module not available")
+
+
+class ChatRequest(BaseModel):
+    """Request model for chat endpoint."""
+    message: str
+
+
+@app.post("/chat")
+async def chat_endpoint(request: ChatRequest):
+    """
+    Process a chat message and return AI response with optional navigation links.
+    
+    Request: { "message": "Where is Dr. Emily Carter's office?" }
+    Response: {
+        "response": "Dr. Emily Carter is in Faculty Office 1...",
+        "actions": [{ "type": "navigate", "label": "...", "roomId": "...", "roomName": "..." }]
+    }
+    """
+    if not CHATBOT_AVAILABLE:
+        return {
+            "response": "Chatbot is currently unavailable. Please try again later.",
+            "actions": []
+        }
+    
+    try:
+        result = process_message(request.message)
+        logger.info(f"Chat: '{request.message[:50]}...' -> intent detected, {len(result.get('actions', []))} actions")
+        return result
+    except Exception as e:
+        logger.error(f"Chat error: {str(e)}")
+        return {
+            "response": "I encountered an error. Please try again.",
+            "actions": []
+        }
+
+
+
 @app.post("/run-inference")
 async def run_inference(image: UploadFile = File(...)):
     """Run floor plan detection on an uploaded image using Roboflow."""

@@ -14,9 +14,11 @@ export const studentContent = {
         { id: 4, name: 'Admin Office', icon: 'building', link: '/map' },
     ],
     faculty: [
-        { id: 1, name: 'Dr. Emily Carter', subject: 'Data Structures', room: 'Room 208', office: 'Block A', available: true },
-        { id: 2, name: 'Prof. James Lee', subject: 'Machine Learning', room: 'Room 312', office: 'Block B', available: false },
-        { id: 3, name: 'Dr. Maria Garcia', subject: 'Software Engineering', room: 'Room 205', office: 'Block A', available: true },
+        { id: 1, name: 'Dr. Emily Carter', subject: 'Data Structures', room: 'Faculty Office 1', roomId: 'node_68', office: 'Block A', available: true },
+        { id: 2, name: 'Prof. James Lee', subject: 'Machine Learning', room: 'Faculty Office 2', roomId: 'node_76', office: 'Block B', available: false },
+        { id: 3, name: 'Dr. Maria Garcia', subject: 'Software Engineering', room: 'Dean\'s Office', roomId: 'node_81', office: 'Block A', available: true },
+        { id: 4, name: 'Dr. Sarah Wilson', subject: 'Computer Networks', room: 'Admin Office 1', roomId: 'node_82', office: 'Block C', available: true },
+        { id: 5, name: 'Prof. Robert Chen', subject: 'Database Systems', room: 'Computer Lab 1', roomId: 'node_61', office: 'Block A', available: false },
     ],
     activities: [
         { id: 1, title: 'Tech Club Weekly Meetup', description: 'Join us for a session on AI/ML trends. Refreshments will be provided!', time: '2 hours ago', location: 'Room 201, Block A' },
