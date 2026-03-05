@@ -1,4 +1,4 @@
-# 🗺️ Campus Compass
+# 🗺️ Campus Connect
 
 **Offline + AR Indoor Navigation for Universities**
 *Hackathon Edition · Lightweight · Fast · Modular*
